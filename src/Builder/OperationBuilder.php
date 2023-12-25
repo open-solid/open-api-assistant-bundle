@@ -7,7 +7,6 @@ use Doctrine\Inflector\InflectorFactory;
 use OpenApi\Annotations\Delete;
 use OpenApi\Annotations\Get;
 use OpenApi\Annotations\Items;
-use OpenApi\Annotations\JsonContent;
 use OpenApi\Annotations\MediaType;
 use OpenApi\Annotations\OpenApi;
 use OpenApi\Annotations\Parameter;
