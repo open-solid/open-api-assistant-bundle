@@ -1,6 +1,6 @@
 {
     "name": "open-solid/open-api-assistant-bundle",
-    "type": "library",
+    "type": "symfony-bundle",
     "license": "MIT",
     "description": "Assistant for OpenApiBundle",
     "minimum-stability": "dev",
