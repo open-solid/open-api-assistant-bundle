@@ -1,9 +1,9 @@
 <?php
 
-namespace OpenSolid\OpenApiAssistantBundle\Tests\Builder;
+namespace OpenSolid\OpenApiAssistantBundle\Tests\OpenApi\Builder;
 
 use OpenApi\Annotations\OpenApi;
-use OpenSolid\OpenApiAssistantBundle\Builder\SchemaBuilder;
+use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilder;
 
 class SchemaBuilderTest extends AbstractBuilderTestCase
 {

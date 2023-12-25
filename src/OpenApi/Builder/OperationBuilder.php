@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenSolid\OpenApiAssistantBundle\Builder;
+namespace OpenSolid\OpenApiAssistantBundle\OpenApi\Builder;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;

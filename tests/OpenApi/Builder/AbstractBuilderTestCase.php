@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenSolid\OpenApiAssistantBundle\Tests\Builder;
+namespace OpenSolid\OpenApiAssistantBundle\Tests\OpenApi\Builder;
 
 use PHPUnit\Framework\TestCase;
 
