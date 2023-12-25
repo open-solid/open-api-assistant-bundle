@@ -1,0 +1,30 @@
+openapi: 3.1.0
+paths:
+  /users:
+    get:
+      operationId: 2a249927d43d0c2f1be26f7ab2442180
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUserView'
+components:
+  schemas:
+    GetUserView:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f15fe4c1-e1e6-4c66-9857-fa320a8d0274
+        name:
+          type: string
+          example: 'John Doe'
+        age:
+          type: integer
+          format: int32
+          example: 40
+      type: object

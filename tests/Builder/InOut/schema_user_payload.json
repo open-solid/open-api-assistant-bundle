@@ -1,0 +1,32 @@
+{
+  "id": "f15fe4c1-e1e6-4c66-9857-fa320a8d0274",
+  "name": "John Doe",
+  "age": 40,
+  "contact": {
+    "email": "john.doe@example.com",
+    "phone": "+1 234 567 890",
+    "website": "https://john.dev"
+  },
+  "secret": "********",
+  "ip": "127.0.0.1",
+  "addresses": [
+    {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "state": "NY",
+      "zip": "12345"
+    },
+    {
+      "street": "456 Main St",
+      "city": "Anytown",
+      "state": "NY",
+      "zip": "12345"
+    }
+  ],
+  "pattern": "/*./",
+  "rating": 4.5,
+  "isActive": true,
+  "status": ["active", "inactive", "banned"],
+  "birthday": "2020-01-01",
+  "createdAt": "2020-01-01T00:00:00+00:00"
+}

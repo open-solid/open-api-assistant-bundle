@@ -1,0 +1,52 @@
+openapi: 3.1.0
+paths:
+  '/users/{id}':
+    patch:
+      operationId: c01430c8f7a02b4d5c0adaa891c8baba
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchUserBody'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatchUserView'
+components:
+  schemas:
+    PatchUserBody:
+      properties:
+        age:
+          type: integer
+          format: int32
+          example: 45
+      type: object
+    PatchUserView:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f15fe4c1-e1e6-4c66-9857-fa320a8d0274
+        name:
+          type: string
+          example: 'John Doe'
+        age:
+          type: integer
+          format: int32
+          example: 45
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-12-25T14:30:00'
+      type: object
