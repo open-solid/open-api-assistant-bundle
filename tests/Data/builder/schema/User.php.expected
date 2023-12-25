@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Schema;
+
+use OpenApi\Attributes\Items;
+use OpenApi\Attributes\Schema;
+use OpenSolid\OpenApiBundle\Attribute\Property;
+
+#[Schema]
+class User
+{
+    #[Property(format: 'uuid', example: 'f15fe4c1-e1e6-4c66-9857-fa320a8d0274')]
+    public string $id;
+    
+    #[Property(description: 'The User name', example: 'John Doe')]
+    public string $name;
+    
+    #[Property(format: 'int32', example: 40)]
+    public int $age;
+    
+    #[Property]
+    public UserContact $contact;
+    
+    #[Property(format: 'password')]
+    public string $secret;
+    
+    #[Property(format: 'ipv4', example: '127.0.0.1')]
+    public string $ip;
+    
+    #[Property(items: new Items(type: UserAddress::class))]
+    public array $addresses;
+    
+    #[Property(pattern: '*.')]
+    public string $pattern;
+    
+    #[Property(format: 'float', example: 4.5)]
+    public float $rating;
+    
+    #[Property(example: true)]
+    public bool $isActive;
+    
+    #[Property(enum: ['active', 'inactive', 'banned'])]
+    public string $status = 'active';
+    
+    #[Property(format: 'date', example: '2020-01-01')]
+    public string $birthday;
+    
+    #[Property(format: 'date-time', example: '2020-01-01T00:00:00+00:00')]
+    public string $createdAt;
+}

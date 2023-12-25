@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Schema;
+
+use OpenApi\Attributes\Schema;
+use OpenSolid\OpenApiBundle\Attribute\Property;
+
+#[Schema(writeOnly: true)]
+class UserAddress
+{
+    #[Property(example: '123 Main St')]
+    public string $street;
+    
+    #[Property(example: 'Anytown')]
+    public string $city;
+    
+    #[Property(example: 'NY')]
+    public string $state;
+    
+    #[Property(example: '12345')]
+    public string $zip;
+}
