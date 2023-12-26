@@ -96,6 +96,9 @@ readonly class SchemaBuilder
                 if (!$pattern && 'password' !== $format) {
                     $property->example = $value;
                 }
+                if ('password' === $format) {
+                    $property->minLength = strlen($value);
+                }
             } else {
                 // unknown type, skip
                 continue;

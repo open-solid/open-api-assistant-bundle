@@ -46,6 +46,7 @@ schemas:
       secret:
         type: string
         format: password
+        minLength: 8
       ip:
         type: string
         format: ipv4
