@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenSolid\OpenApiAssistantBundle\Builder;
+namespace OpenSolid\OpenApiAssistantBundle\Php\Builder;
 
 use OpenApi\Annotations\Property;
 use OpenApi\Annotations\Schema;
