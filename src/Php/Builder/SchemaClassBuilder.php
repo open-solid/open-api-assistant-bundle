@@ -5,14 +5,16 @@ namespace OpenSolid\OpenApiAssistantBundle\Php\Builder;
 use OpenApi\Annotations\Property;
 use OpenApi\Annotations\Schema;
 use OpenApi\Generator;
+use OpenSolid\OpenApiAssistantBundle\Php\Printer\StdPhpPrinter;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
 use PhpParser\Node\NullableType;
-use PhpParser\PrettyPrinter\Standard;
 
 readonly class SchemaClassBuilder
 {
+    use ClassBuilderTrait;
+
     private const PROPS = [
         'title',
         'description',
@@ -32,12 +34,12 @@ readonly class SchemaClassBuilder
     ];
 
     private BuilderFactory $builder;
-    private Standard $printer;
+    private StdPhpPrinter $printer;
 
     public function __construct()
     {
         $this->builder = new BuilderFactory();
-        $this->printer = new Standard(['shortArraySyntax' => true]);
+        $this->printer = new StdPhpPrinter();
     }
 
     public function build(string $namespace, Schema $schema): string
@@ -106,32 +108,5 @@ readonly class SchemaClassBuilder
         }
 
         return $prop;
-    }
-
-    private function getPhpType(Property $property): string|NullableType
-    {
-        if (Generator::isDefault($property->type) && !Generator::isDefault($property->ref)) {
-            $type = $this->parseClassRef($property->ref);
-        } else {
-            $type = match ($property->type) {
-                'integer' => 'int',
-                'number' => 'float',
-                'boolean' => 'bool',
-                default => $property->type,
-            };
-        }
-
-        if (true === $property->nullable) {
-            $type = new NullableType($type);
-        }
-
-        return $type;
-    }
-
-    private function parseClassRef(string $ref): string
-    {
-        $parts = explode('/', $ref);
-
-        return array_pop($parts);
     }
 }

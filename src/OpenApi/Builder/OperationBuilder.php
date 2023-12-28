@@ -18,13 +18,16 @@ use OpenApi\Annotations\RequestBody;
 use OpenApi\Annotations\Response;
 use OpenApi\Annotations\Schema;
 use OpenApi\Generator;
+use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
 
-readonly class OperationBuilder
+final readonly class OperationBuilder
 {
     private Inflector $inflector;
 
-    public function __construct(private SchemaBuilder $payloadToSchemaConverter)
-    {
+    public function __construct(
+        private SchemaBuilder $schemaBuilder,
+        private HttpRequestInterpreter $httpInterpreter,
+    ) {
         $this->inflector = InflectorFactory::create()->build();
     }
 
@@ -53,33 +56,6 @@ readonly class OperationBuilder
         }
 
         $this->buildResponse($method, $uri, $res ?? '', $openApi, $methodItem);
-    }
-
-    private function guessSuccessStatusCode(string $method, bool $hasResponse = true): int
-    {
-        return match($method) {
-            'post' => 201,
-            'delete' => $hasResponse ? 200 : 204,
-            default => 200,
-        };
-    }
-
-    private function guessContentType(string $payload): string
-    {
-        return '[' === $payload[0] ? 'array' : 'object';
-    }
-
-    private function guessResourceName(string $uri): string
-    {
-        $parts = array_filter(explode('/', $uri), static fn (string $part): bool => '' !== $part);
-
-        if ([] === $parts) {
-            throw new \InvalidArgumentException(sprintf('Unable to guess resource name from URI "%s"', $uri));
-        }
-
-        $resource = array_shift($parts);
-
-        return ucfirst($this->inflector->singularize($resource));
     }
 
     private function buildMethodItem(string $method, string $uri): Put|Delete|Get|Patch|Post
@@ -125,9 +101,9 @@ readonly class OperationBuilder
         OpenApi $openApi,
         Post|Patch|Get|Delete|Put $methodItem
     ): void {
-        $resource = $this->guessResourceName($uri);
+        $resource = $this->httpInterpreter->getResourceName($uri);
         $name = $this->inflector->classify($method.' '.$resource.' Body');
-        $this->payloadToSchemaConverter->build($name, $payload, $openApi);
+        $this->schemaBuilder->build($name, $payload, $openApi);
 
         $content = new MediaType(['mediaType' => 'application/json']);
         $content->schema = new Schema([]);
@@ -147,19 +123,19 @@ readonly class OperationBuilder
         Post|Patch|Get|Delete|Put $methodItem
     ): void {
         $response = new Response([
-            'response' => $this->guessSuccessStatusCode($method, '' !== $payload),
+            'response' => $this->httpInterpreter->getSuccessStatusCode($method, '' !== $payload),
             'description' => 'Successful',
         ]);
 
-        $resource = $this->guessResourceName($uri);
+        $resource = $this->httpInterpreter->getResourceName($uri);
         $name = $this->inflector->classify($method.' '.$resource.' View');
 
         if ('' !== $payload) {
-            $this->payloadToSchemaConverter->build($name, $payload, $openApi);
+            $this->schemaBuilder->build($name, $payload, $openApi);
 
             $content = new MediaType(['mediaType' => 'application/json']);
             $content->schema = new Schema([]);
-            $content->schema->type = $this->guessContentType($payload);
+            $content->schema->type = $this->httpInterpreter->getContentType($payload);
             if ('array' === $content->schema->type) {
                 $content->schema->items = new Items([]);
                 $content->schema->items->ref = '#/components/schemas/'.$name;

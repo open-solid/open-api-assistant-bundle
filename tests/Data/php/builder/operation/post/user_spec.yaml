@@ -1,0 +1,18 @@
+openapi: 3.1.0
+paths:
+  /users:
+    post:
+      operationId: 10a969a82179055d97f1f9815eeaa0e7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUserBody'
+      responses:
+        '201':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostUserView'

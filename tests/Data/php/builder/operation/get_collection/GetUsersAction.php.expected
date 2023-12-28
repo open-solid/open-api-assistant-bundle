@@ -1,0 +1,13 @@
+<?php
+
+namespace Api\User\Controller\Get;
+
+use OpenSolid\OpenApiBundle\Routing\Attribute\Get;
+
+class GetUserAction
+{
+    #[Get('/users', itemsType: GetUserView::class)]
+    public function __invoke(): array
+    {
+    }
+}

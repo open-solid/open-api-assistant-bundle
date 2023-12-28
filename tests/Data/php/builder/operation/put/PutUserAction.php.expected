@@ -1,0 +1,15 @@
+<?php
+
+namespace Api\User\Controller\Put;
+
+use OpenSolid\OpenApiBundle\Attribute\Body;
+use OpenSolid\OpenApiBundle\Attribute\Path;
+use OpenSolid\OpenApiBundle\Routing\Attribute\Put;
+
+class PutUserAction
+{
+    #[Put('/users/{id}')]
+    public function __invoke(#[Path] string $id, #[Body] PutUserBody $body): PutUserView
+    {
+    }
+}

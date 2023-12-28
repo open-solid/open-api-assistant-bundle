@@ -5,6 +5,7 @@ namespace OpenSolid\OpenApiAssistantBundle\Tests\OpenApi\Builder;
 use OpenApi\Annotations\OpenApi;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilder;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilder;
+use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
 use OpenSolid\OpenApiAssistantBundle\Tests\AbstractBuilderTestCase;
 
 class OperationBuilderTest extends AbstractBuilderTestCase
@@ -14,7 +15,7 @@ class OperationBuilderTest extends AbstractBuilderTestCase
         $openApi = new OpenApi(['openapi' => '3.1.0']);
         $response = $this->loadFileContent('open-api/builder/operation/get_collection/users_response.json');
 
-        $operationBuilder = new OperationBuilder(new SchemaBuilder());
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
         $operationBuilder->build('get', '/users', null, $response, $openApi);
 
         $this->assertTrue($openApi->validate());
@@ -26,7 +27,7 @@ class OperationBuilderTest extends AbstractBuilderTestCase
         $openApi = new OpenApi(['openapi' => '3.1.0']);
         $response = $this->loadFileContent('open-api/builder/operation/get/user_response.json');
 
-        $operationBuilder = new OperationBuilder(new SchemaBuilder());
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
         $operationBuilder->build('get', '/users/{id}', null, $response, $openApi);
 
         $this->assertTrue($openApi->validate());
@@ -39,7 +40,7 @@ class OperationBuilderTest extends AbstractBuilderTestCase
         $request = $this->loadFileContent('open-api/builder/operation/post/user_request.json');
         $response = $this->loadFileContent('open-api/builder/operation/post/user_response.json');
 
-        $operationBuilder = new OperationBuilder(new SchemaBuilder());
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
         $operationBuilder->build('post', '/users', $request, $response, $openApi);
 
         $this->assertTrue($openApi->validate());
@@ -52,7 +53,7 @@ class OperationBuilderTest extends AbstractBuilderTestCase
         $request = $this->loadFileContent('open-api/builder/operation/put/user_request.json');
         $response = $this->loadFileContent('open-api/builder/operation/put/user_response.json');
 
-        $operationBuilder = new OperationBuilder(new SchemaBuilder());
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
         $operationBuilder->build('put', '/users/{id}', $request, $response, $openApi);
 
         $this->assertTrue($openApi->validate());
@@ -65,7 +66,7 @@ class OperationBuilderTest extends AbstractBuilderTestCase
         $request = $this->loadFileContent('open-api/builder/operation/patch/user_request.json');
         $response = $this->loadFileContent('open-api/builder/operation/patch/user_response.json');
 
-        $operationBuilder = new OperationBuilder(new SchemaBuilder());
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
         $operationBuilder->build('patch', '/users/{id}', $request, $response, $openApi);
 
         $this->assertTrue($openApi->validate());
@@ -76,7 +77,7 @@ class OperationBuilderTest extends AbstractBuilderTestCase
     {
         $openApi = new OpenApi(['openapi' => '3.1.0']);
 
-        $operationBuilder = new OperationBuilder(new SchemaBuilder());
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
         $operationBuilder->build('delete', '/users/{id}', null, null, $openApi);
 
         $this->assertTrue($openApi->validate());
