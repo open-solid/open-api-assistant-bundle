@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Assistant</title>
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
 </head>
 <body class="bg-white dark:bg-black">
 
@@ -95,27 +97,28 @@
 <div class="container mx-auto max-w-5xl px-5 mt-10 space-y-4">
     {% if openapi is defined %}
         <div>
-            <span class="text-white p-1">OpenApi.yaml</span>
-            <pre class="text-white border border-indigo-900 rounded-md p-5">{{ openapi }}</pre>
+            <span class="text-white">OpenApi.yaml</span>
+            <pre class="text-sm"><code class="language-yaml">{{ openapi }}</code></pre>
         </div>
     {% endif %}
 
     {% if controller_code is defined %}
         <div>
-            <span class="text-white p-1">PostProductAction.php</span>
-            <pre class="text-white border border-indigo-900 rounded-md p-5">{{ controller_code }}</pre>
+            <span class="text-white">PostProductAction.php</span>
+            <pre class="text-sm"><code class="language-php">{{ controller_code }}</code></pre>
         </div>
     {% endif %}
 
     {% if payload_classes_code is defined %}
         {% for name, payload_code in payload_classes_code %}
             <div>
-                <span class="text-white p-1">{{ name }}.php</span>
-                <pre class="text-white border border-indigo-900 rounded-md p-5">{{ payload_code }}</pre>
+                <span class="text-white">{{ name }}.php</span>
+                <pre class="text-sm"><code class="language-php">{{ payload_code }}</code></pre>
             </div>
         {% endfor %}
     {% endif %}
 </div>
 
+<script>hljs.highlightAll();</script>
 </body>
 </html>
