@@ -8,7 +8,9 @@
         "php": ">=8.2",
         "doctrine/inflector": "^2.0",
         "nikic/php-parser": "^4.18",
-        "open-solid/open-api-bundle": "dev-main"
+        "open-solid/open-api-bundle": "dev-main",
+        "symfony/framework-bundle": "^7.0",
+        "symfony/twig-bundle": "^7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10"

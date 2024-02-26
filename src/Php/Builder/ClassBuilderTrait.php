@@ -11,7 +11,7 @@ trait ClassBuilderTrait
 {
     private function getPhpType(Schema $schema, bool $isAttributeType = false): string|NullableType|ClassConstFetch
     {
-        if (Generator::isDefault($schema->type) && !Generator::isDefault($schema->ref)) {
+        if ((Generator::isDefault($schema->type) || $schema->type === 'object') && !Generator::isDefault($schema->ref)) {
             $type = $this->parseClassRef($schema->ref);
 
             if ($isAttributeType) {

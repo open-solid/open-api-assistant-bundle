@@ -103,7 +103,7 @@ final readonly class OperationBuilder
     ): void {
         $resource = $this->httpInterpreter->getResourceName($uri);
         $name = $this->inflector->classify($method.' '.$resource.' Body');
-        $this->schemaBuilder->build($name, $payload, $openApi);
+        $this->schemaBuilder->build($name, $payload, $openApi, ['suffix' => 'Body']);
 
         $content = new MediaType(['mediaType' => 'application/json']);
         $content->schema = new Schema([]);
@@ -131,7 +131,7 @@ final readonly class OperationBuilder
         $name = $this->inflector->classify($method.' '.$resource.' View');
 
         if ('' !== $payload) {
-            $this->schemaBuilder->build($name, $payload, $openApi);
+            $this->schemaBuilder->build($name, $payload, $openApi, ['suffix' => 'View']);
 
             $content = new MediaType(['mediaType' => 'application/json']);
             $content->schema = new Schema([]);

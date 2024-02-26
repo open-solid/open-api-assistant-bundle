@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Assistant</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+</head>
+<body class="bg-white dark:bg-black">
+
+<form action="{{ path('openapi_assistant') }}" method="post">
+    <div class="container mx-auto max-w-5xl px-5">
+        <h2 class="text-base font-semibold leading-7 text-white mt-6">New Endpoint</h2>
+        <p class="mb-1 text-sm leading-6 text-gray-400">Create API endpoints and specs from payloads.</p>
+
+        <div class="space-y-4">
+            <div class="space-y-4 sm:space-x-4 sm:flex">
+                <div class="mt-4 sm:flex-none">
+                    <label for="endpoint-method" class="block text-sm font-medium leading-6 text-white">Method</label>
+                    <div class="mt-2">
+                        <select id="endpoint-method" name="method"
+                                class="block rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black">
+                            <option {{ request.method == 'POST' ? 'selected' }}>POST</option>
+                            <option {{ request.method == 'GET' ? 'selected' }}>GET</option>
+                            <option {{ request.method == 'PUT' ? 'selected' }}>PUT</option>
+                            <option {{ request.method == 'PATCH' ? 'selected' }}>PATCH</option>
+                            <option {{ request.method == 'DELETE' ? 'selected' }}>DELETE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sm:flex-1 sm:grow">
+                    <label for="endpoint-uri" class="block text-sm font-medium leading-6 text-white">URI</label>
+                    <div class="mt-2">
+                        <div class="flex rounded-md bg-white/5 ring-1 ring-inset ring-white/10 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                            <label for="endpoint-path"
+                                   class="flex select-none items-center pl-3 text-gray-500 sm:text-sm">https://localhost/</label>
+                            <input type="text" autofocus="autofocus" name="uri" autocomplete="off"
+                                   id="endpoint-uri"
+                                   class="flex-1 border-0 bg-transparent py-1.5 pl-0 text-white focus:ring-0 sm:text-sm sm:leading-6"
+                                   placeholder="products"
+                                   value="{{ request.uri ?? '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 md:space-y-0 md:space-x-4 md:flex">
+                <div class="md:flex-1">
+                    <div class="flex items-center">
+                        <label for="request-payload" class="block text-sm font-medium leading-6 text-white">PostProductBody</label>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                             class="w-5 h-5 fill-white ml-1 hidden">
+                            <path fill-rule="evenodd"
+                                  d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="mt-2">
+                        <textarea rows="10" name="req" id="request-payload"
+                                  class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                  placeholder="Add your request payload...">{{ request.req ?? '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="md:flex-1">
+                    <div class="flex items-center">
+                        <label for="response-payload" class="block text-sm font-medium leading-6 text-white">PostProductView</label>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                             class="w-5 h-5 fill-white ml-1 hidden">
+                            <path fill-rule="evenodd"
+                                  d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                                  clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="mt-2">
+                        <textarea rows="10" name="res" id="response-payload"
+                                  class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                                  placeholder="Add your response payload...">{{ request.res ?? '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-x-6">
+            <button type="button" class="text-sm font-semibold leading-6 text-white">Cancel</button>
+            <button type="submit"
+                    class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                Preview
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="container mx-auto max-w-5xl px-5 mt-10 space-y-4">
+    {% if openapi is defined %}
+        <div>
+            <span class="text-white p-1">OpenApi.yaml</span>
+            <pre class="text-white border border-indigo-900 rounded-md p-5">{{ openapi }}</pre>
+        </div>
+    {% endif %}
+
+    {% if controller_code is defined %}
+        <div>
+            <span class="text-white p-1">PostProductAction.php</span>
+            <pre class="text-white border border-indigo-900 rounded-md p-5">{{ controller_code }}</pre>
+        </div>
+    {% endif %}
+
+    {% if payload_classes_code is defined %}
+        {% for name, payload_code in payload_classes_code %}
+            <div>
+                <span class="text-white p-1">{{ name }}.php</span>
+                <pre class="text-white border border-indigo-900 rounded-md p-5">{{ payload_code }}</pre>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+</body>
+</html>

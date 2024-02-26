@@ -5,6 +5,9 @@ namespace OpenSolid\OpenApiAssistantBundle\Php\Builder;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use OpenApi\Annotations\Operation;
+use OpenApi\Annotations\RequestBody;
+use OpenApi\Annotations\Response;
+use OpenApi\Annotations\Schema;
 use OpenApi\Generator;
 use OpenSolid\OpenApiAssistantBundle\Php\Printer\StdPhpPrinter;
 use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
@@ -55,11 +58,11 @@ readonly class OperationClassBuilder
             }
         }
 
-        if (!Generator::isDefault($operation->requestBody) && isset($operation->requestBody->content[$this->contentType]->schema)) {
+        if (null !== $schema = $this->getContentMediaTypeSchema($operation->requestBody, $this->contentType)) {
             array_unshift($useStmts, $this->builder->use('OpenSolid\\OpenApiBundle\\Attribute\\Body'));
             $param = $this->builder->param('body')
                 ->addAttribute($this->builder->attribute('Body'))
-                ->setType($this->getPhpType($operation->requestBody->content[$this->contentType]->schema))
+                ->setType($this->getPhpType($schema))
             ;
             $methodStmt->addParam($param);
         }
@@ -70,16 +73,18 @@ readonly class OperationClassBuilder
                     continue;
                 }
 
-                if (isset($response->content[$this->contentType]->schema)) {
-                    $returnType = $this->getPhpType($response->content[$this->contentType]->schema);
+                $schema = $this->getContentMediaTypeSchema($response, $this->contentType);
+
+                if (null !== $schema) {
+                    $returnType = $this->getPhpType($schema);
                 } else {
                     $returnType = 'void';
                 }
 
                 $methodStmt->setReturnType($returnType);
 
-                if ('array' === $returnType && isset($response->content[$this->contentType]->schema->items)) {
-                    $routeAttrArgs['itemsType'] = $this->getPhpType($response->content[$this->contentType]->schema->items, true);
+                if ('array' === $returnType && null !== $schema && $schema->items) {
+                    $routeAttrArgs['itemsType'] = $this->getPhpType($schema->items, true);
                 }
 
                 break;
@@ -99,5 +104,22 @@ readonly class OperationClassBuilder
         ]);
 
         return $this->printer->prettyPrintFile([$rootNode->getNode()]);
+    }
+
+    private function getContentMediaTypeSchema(RequestBody|Response|string $subject, string $mediaTypeValue): ?Schema
+    {
+        if (is_string($subject)) {
+            return null;
+        }
+
+        if (is_array($subject->content)) {
+            foreach ($subject->content as $mediaType) {
+                if ($mediaType->mediaType === $mediaTypeValue && $mediaType->schema instanceof Schema) {
+                    return $mediaType->schema;
+                }
+            }
+        }
+
+        return null;
     }
 }

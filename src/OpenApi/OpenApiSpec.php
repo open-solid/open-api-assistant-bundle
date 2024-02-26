@@ -21,6 +21,7 @@ class OpenApiSpec
         return match (true) {
             is_int($value) => 'int32',
             is_float($value) => 'float',
+            is_numeric($value) => null,
             '********' === $value => 'password',
             is_string($value) => match(1) {
                 preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) => 'date',

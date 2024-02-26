@@ -12,7 +12,7 @@ use OpenApi\Annotations\Schema;
 use OpenApi\Generator;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\OpenApiSpec;
 
-readonly class SchemaBuilder
+final readonly class SchemaBuilder
 {
     private Inflector $inflector;
 
@@ -21,17 +21,17 @@ readonly class SchemaBuilder
         $this->inflector = InflectorFactory::create()->build();
     }
 
-    public function build(string $name, string $payload, OpenApi $openApi): void
+    public function build(string $name, string $payload, OpenApi $openApi, array $options = []): void
     {
         if (Generator::isDefault($openApi->components)) {
             $openApi->components = new Components([]);
             $openApi->components->schemas = [];
         }
 
-        $this->process($name, json_decode($payload), $openApi->components);
+        $this->process($name, json_decode($payload), $openApi->components, $options);
     }
 
-    protected function process(string $name, mixed $payload, Components $components): Schema
+    protected function process(string $name, mixed $payload, Components $components, array $options): Schema
     {
         $schemaName = ucfirst($name);
 
@@ -53,7 +53,7 @@ readonly class SchemaBuilder
                 } elseif (is_object($value)) {
                     $schema->items = new Items([]);
                     $schema->items->type = 'object';
-                    $nestedSchema = $this->process($schemaName, $value, $components);
+                    $nestedSchema = $this->process($schemaName, $value, $components, $options);
                     $schema->items->ref = '#/components/schemas/'.$nestedSchema->schema;
                 }
 
@@ -61,7 +61,8 @@ readonly class SchemaBuilder
             }
 
             if (is_object($value)) {
-                $nestedSchema = $this->process($schemaName.ucfirst($key), $value, $components);
+                $nestedSchemaName = $this->buildSchemaName($schemaName, ucfirst($key), $options);
+                $nestedSchema = $this->process($nestedSchemaName, $value, $components, $options);
                 $property = new Property(['property' => $key]);
                 $property->type = 'object';
                 $property->ref = '#/components/schemas/'.$nestedSchema->schema;
@@ -75,7 +76,8 @@ readonly class SchemaBuilder
                     $property->type = 'array';
                     $property->items = new Items([]);
                     $property->items->type = 'object';
-                    $nestedSchema = $this->process($schemaName.ucfirst($this->inflector->singularize($key)), $value[0], $components);
+                    $nestedSchemaName = $this->buildSchemaName($schemaName, ucfirst($this->inflector->singularize($key)), $options);
+                    $nestedSchema = $this->process($nestedSchemaName, $value[0], $components, $options);
                     $property->items->ref = '#/components/schemas/'.$nestedSchema->schema;
                 } elseif (is_string($value[0]) || is_int($value[0])) {
                     $property->type = gettype($value[0]);
@@ -112,5 +114,14 @@ readonly class SchemaBuilder
         }
 
         return $schema;
+    }
+
+    private function buildSchemaName(string $firstName, string $lastName, array $options): string
+    {
+        if (isset($options['suffix'])) {
+            $firstName = substr($firstName, 0, -strlen($options['suffix']));
+        }
+
+        return $firstName.$lastName;
     }
 }
