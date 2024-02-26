@@ -32,7 +32,7 @@ class OpenApiAssistantAction extends AbstractController
             'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
         ]);
         $method = strtolower($request->request->getString('method'));
-        $uri = '/'.strtolower($request->request->getString('uri'));
+        $uri = '/'.strtolower(trim($request->request->getString('uri'), '/'));
         $req = $request->request->getString('req') ?: null;
         $res = $request->request->getString('res') ?: null;
         $namespace = $request->request->getString('namespace', 'App\\'.$interpreter->getResourceName($uri).'\\Controller\\'.$inflector->classify($method));
