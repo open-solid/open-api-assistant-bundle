@@ -38,7 +38,7 @@ final readonly class HttpRequestInterpreter
 
         do {
             $resource = array_pop($parts);
-        } while ($resource[0] === '{');
+        } while (null !== $resource && $resource[0] === '{');
 
         return ucfirst($this->inflector->singularize($resource));
     }
