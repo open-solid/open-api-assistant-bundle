@@ -35,6 +35,11 @@ class OpenApiAssistantAction extends AbstractController
         $uri = '/'.strtolower(trim($request->request->getString('uri'), '/'));
         $req = $request->request->getString('req') ?: null;
         $res = $request->request->getString('res') ?: null;
+
+        if ('/' === $uri) {
+            throw new BadRequestHttpException('Empty URI.');
+        }
+
         $namespace = $request->request->getString('namespace', 'App\\'.$interpreter->getResourceName($uri).'\\Controller\\'.$inflector->classify($method));
 
         $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter);
