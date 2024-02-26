@@ -36,7 +36,9 @@ final readonly class HttpRequestInterpreter
             throw new \InvalidArgumentException(sprintf('Unable to guess resource name from URI "%s"', $uri));
         }
 
-        $resource = array_shift($parts);
+        do {
+            $resource = array_pop($parts);
+        } while ($resource[0] === '{');
 
         return ucfirst($this->inflector->singularize($resource));
     }
