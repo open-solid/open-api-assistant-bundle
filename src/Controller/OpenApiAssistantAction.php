@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class OpenApiAssistantAction extends AbstractController
 {
-    public function __invoke(Request $request): Response
+    public function index(Request $request): Response
     {
         if (!$request->isMethod('POST')) {
             return $this->render('@OpenApiAssistant/assistant.html.twig');
@@ -84,5 +84,10 @@ class OpenApiAssistantAction extends AbstractController
             'payload_classes_code' => $payloadClassesCode,
             'request' => $request->request->all(),
         ]);
+    }
+
+    public function generate(Request $request): Response
+    {
+        return $this->render('@OpenApiAssistant/assistant.html.twig');
     }
 }
