@@ -4,6 +4,7 @@ namespace OpenSolid\OpenApiAssistantBundle\OpenApi\Builder;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use JsonException;
 use OpenApi\Annotations\Components;
 use OpenApi\Annotations\Items;
 use OpenApi\Annotations\OpenApi;
@@ -21,6 +22,9 @@ final readonly class SchemaBuilder
         $this->inflector = InflectorFactory::create()->build();
     }
 
+    /**
+     * @throws JsonException
+     */
     public function build(string $name, string $payload, OpenApi $openApi, array $options = []): void
     {
         if (Generator::isDefault($openApi->components)) {
@@ -28,7 +32,7 @@ final readonly class SchemaBuilder
             $openApi->components->schemas = [];
         }
 
-        $this->process($name, json_decode($payload), $openApi->components, $options);
+        $this->process($name, json_decode($payload, flags: JSON_THROW_ON_ERROR), $openApi->components, $options);
     }
 
     protected function process(string $name, mixed $payload, Components $components, array $options): Schema
