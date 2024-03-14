@@ -21,7 +21,10 @@
     "autoload": {
         "psr-4": {
             "OpenSolid\\OpenApiAssistantBundle\\": "src/"
-        }
+        },
+        "exclude-from-classmap": [
+            "demo/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
