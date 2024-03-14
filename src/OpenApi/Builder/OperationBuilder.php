@@ -27,6 +27,10 @@ final readonly class OperationBuilder
     public function __construct(
         private SchemaBuilder $schemaBuilder,
         private HttpRequestInterpreter $httpInterpreter,
+        private array $options = [
+            'request' => ['suffix' => 'Body'],
+            'response' => ['suffix' => 'View'],
+        ],
     ) {
         $this->inflector = InflectorFactory::create()->build();
     }
@@ -103,7 +107,7 @@ final readonly class OperationBuilder
     ): void {
         $resource = $this->httpInterpreter->getResourceName($uri);
         $name = $this->inflector->classify($method.' '.$resource.' Body');
-        $this->schemaBuilder->build($name, $payload, $openApi, ['suffix' => 'Body']);
+        $this->schemaBuilder->build($name, $payload, $openApi, $this->options['request']);
 
         $content = new MediaType(['mediaType' => 'application/json']);
         $content->schema = new Schema([]);
@@ -131,7 +135,7 @@ final readonly class OperationBuilder
         $name = $this->inflector->classify($method.' '.$resource.' View');
 
         if ('' !== $payload) {
-            $this->schemaBuilder->build($name, $payload, $openApi, ['suffix' => 'View']);
+            $this->schemaBuilder->build($name, $payload, $openApi, $this->options['response']);
 
             $content = new MediaType(['mediaType' => 'application/json']);
             $content->schema = new Schema([]);
