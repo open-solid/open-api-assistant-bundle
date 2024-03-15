@@ -7,6 +7,7 @@ use OpenApi\Annotations\Info;
 use OpenApi\Annotations\OpenApi;
 use OpenApi\Generator;
 use OpenSolid\OpenApiAssistantBundle\Form\Type\NewEndpointType;
+use OpenSolid\OpenApiAssistantBundle\Model\FlashMessage;
 use OpenSolid\OpenApiAssistantBundle\Model\NewEndpointModel;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilder;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilder;
@@ -17,7 +18,6 @@ use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class OpenApiAssistantAction extends AbstractController
 {
@@ -29,6 +29,13 @@ class OpenApiAssistantAction extends AbstractController
             ->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
+            if ($form->getErrors(true)->count() > 0) {
+                $this->addFlash('error', new FlashMessage(
+                    title: 'Validation failed!',
+                    body: 'Oops! It looks like there was an error with the data you entered. Please check the form and try again.',
+                ));
+            }
+
             return $this->render('@OpenApiAssistant/assistant.html.twig', [
                 'form' => $form->createView(),
             ]);
@@ -57,7 +64,14 @@ class OpenApiAssistantAction extends AbstractController
         $operationBuilder->build($method, $uri, $req, $res, $openApi);
 
         if (!$openApi->validate()) {
-            throw new BadRequestHttpException('Invalid specs.');
+            $this->addFlash('error', new FlashMessage(
+                title: 'Validation failed!',
+                body: 'Something went wrong generating the OpenAPI Spec.',
+            ));
+
+            return $this->render('@OpenApiAssistant/assistant.html.twig', [
+                'form' => $form->createView(),
+            ]);
         }
 
         // generate controller content
@@ -101,10 +115,10 @@ class OpenApiAssistantAction extends AbstractController
                 file_put_contents($dir.sprintf('/%s.php', $name), $classCode);
             }
 
-            $this->addFlash('success', [
-                'title' => 'Successfully generated!',
-                'body' => 'Your new classes has been saved as files.',
-            ]);
+            $this->addFlash('success', new FlashMessage(
+                title: 'Successfully generated!',
+                body: 'Your new classes has been saved as files.',
+            ));
 
             return $this->redirectToRoute('openapi_assistant');
         }
