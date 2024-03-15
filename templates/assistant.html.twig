@@ -75,7 +75,7 @@
             <div class="space-y-4 md:space-y-0 md:space-x-4 md:flex">
                 <div class="md:flex-1">
                     <div class="flex items-center">
-                        <label for="request-payload" class="block text-sm font-medium leading-6 text-white">PostProductBody</label>
+                        <label for="request-payload" class="block text-sm font-medium leading-6 text-white">Request</label>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                              class="w-5 h-5 fill-white ml-1 hidden">
                             <path fill-rule="evenodd"
@@ -92,7 +92,7 @@
 
                 <div class="md:flex-1">
                     <div class="flex items-center">
-                        <label for="response-payload" class="block text-sm font-medium leading-6 text-white">PostProductView</label>
+                        <label for="response-payload" class="block text-sm font-medium leading-6 text-white">Response</label>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                              class="w-5 h-5 fill-white ml-1 hidden">
                             <path fill-rule="evenodd"
@@ -136,7 +136,7 @@
 
         {% if controller_code is defined %}
             <div>
-                <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">PostProductAction.php</div>
+                <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">{{ controller_class_name }}.php</div>
                 <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-php">{{ controller_code }}</code></pre>
             </div>
         {% endif %}

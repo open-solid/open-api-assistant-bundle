@@ -9,6 +9,7 @@ use OpenApi\Generator;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilder;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilder;
 use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilder;
+use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilderOptions;
 use OpenSolid\OpenApiAssistantBundle\Php\Builder\SchemaClassBuilder;
 use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,7 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         $interpreter = new HttpRequestInterpreter();
+        $operationClassBuilderOptions = new OperationClassBuilderOptions();
         $inflector = InflectorFactory::create()->build();
 
         $openApi = new OpenApi([
@@ -42,8 +44,12 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         $resourceName = $interpreter->getResourceName($uri);
-        $namespace = $request->request->getString('namespace', 'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method));
+        $namespace = $request->request->getString(
+            'namespace',
+            'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method)
+        );
 
+        // build Open API Spec
         $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter);
         $operationBuilder->build($method, $uri, $req, $res, $openApi);
 
@@ -51,8 +57,14 @@ class OpenApiAssistantAction extends AbstractController
             throw new BadRequestHttpException('Invalid specs.');
         }
 
-        $operationClassBuilder = new OperationClassBuilder(new HttpRequestInterpreter());
+        $operationClassBuilder = new OperationClassBuilder(
+            $interpreter,
+            'application/json',
+            $operationClassBuilderOptions,
+        );
 
+        // generate controller content
+        $controllerClassName = '';
         $controllerCode = '';
         foreach ($openApi->paths as $pathItem) {
             if (!Generator::isDefault($pathItem->post)) {
@@ -69,9 +81,11 @@ class OpenApiAssistantAction extends AbstractController
                 continue;
             }
 
+            $controllerClassName = $inflector->classify($operation->method.' '.$resourceName.' '.$operationClassBuilderOptions->suffix);
             $controllerCode = $operationClassBuilder->build($namespace, $operation, $uri);
         }
 
+        // generate payloads content
         $payloadClassesCode = [];
         if (!Generator::isDefault($openApi->components)) {
             $schemaClassBuilder = new SchemaClassBuilder();
@@ -81,11 +95,11 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         if ('generate' === $action) {
-            $dir = dirname(__DIR__, 2).sprintf('/demo/src/%s/Controller/%s', $resourceName, ucfirst($method));
+            $dir = dirname(__DIR__, 2).sprintf('/demo/src/%s/Controller/%s', $resourceName, $inflector->classify($method));
             if (!is_dir($dir) && !mkdir($dir, recursive: true) && !is_dir($dir)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
             }
-            file_put_contents($dir.sprintf('/%s.php', 'PostProductAction'), $controllerCode);
+            file_put_contents($dir.sprintf('/%s.php', $controllerClassName), $controllerCode);
             foreach ($payloadClassesCode as $name => $classCode) {
                 file_put_contents($dir.sprintf('/%s.php', $name), $classCode);
             }
@@ -97,6 +111,7 @@ class OpenApiAssistantAction extends AbstractController
 
         return $this->render('@OpenApiAssistant/assistant.html.twig', [
             'openapi' => $openApi->toYaml(),
+            'controller_class_name' => $controllerClassName,
             'controller_code' => $controllerCode,
             'payload_classes_code' => $payloadClassesCode,
             'request' => $request->request->all(),

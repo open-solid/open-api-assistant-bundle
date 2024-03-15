@@ -42,7 +42,6 @@ readonly class OperationClassBuilder
             $this->builder->use('OpenSolid\\OpenApiBundle\\Routing\\Attribute\\'.$routeAttrName),
         ];
 
-
         $routeAttrArgs = [$uri];
 
         $methodStmt = $this->builder->method('__invoke')
