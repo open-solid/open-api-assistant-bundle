@@ -8,11 +8,14 @@
         "php": ">=8.2",
         "doctrine/inflector": "^2.0",
         "nikic/php-parser": "^4.18",
-        "open-solid/open-api-bundle": "dev-main",
+        "symfony/form": "^7.0",
         "symfony/framework-bundle": "^7.0",
-        "symfony/twig-bundle": "^7.0"
+        "symfony/serializer": "^7.0",
+        "symfony/twig-bundle": "^7.0",
+        "symfony/validator": "^7.0"
     },
     "require-dev": {
+        "open-solid/open-api-bundle": "dev-main",
         "phpunit/phpunit": "^10"
     },
     "config": {

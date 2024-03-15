@@ -6,6 +6,8 @@ use Doctrine\Inflector\InflectorFactory;
 use OpenApi\Annotations\Info;
 use OpenApi\Annotations\OpenApi;
 use OpenApi\Generator;
+use OpenSolid\OpenApiAssistantBundle\Form\Type\NewEndpointType;
+use OpenSolid\OpenApiAssistantBundle\Model\NewEndpointModel;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilder;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilder;
 use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilder;
@@ -21,25 +23,28 @@ class OpenApiAssistantAction extends AbstractController
 {
     public function __invoke(Request $request): Response
     {
-        if (!$request->isMethod('POST')) {
-            return $this->render('@OpenApiAssistant/assistant.html.twig');
+        $newEndpoint = new NewEndpointModel();
+
+        $form = $this->createForm(NewEndpointType::class, $newEndpoint)
+            ->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->render('@OpenApiAssistant/assistant.html.twig', [
+                'form' => $form->createView(),
+            ]);
         }
 
-        // TODO: validate request
-        $method = strtolower($request->request->getString('method'));
-        $uri = '/'.strtolower(trim($request->request->getString('uri'), '/'));
-        $req = $request->request->getString('req') ?: null;
-        $res = $request->request->getString('res') ?: null;
+        $method = strtolower($newEndpoint->method);
+        $uri = '/'.strtolower(trim($newEndpoint->uri, '/'));
+        $req = $newEndpoint->req;
+        $res = $newEndpoint->res;
         $action = $request->request->getString('action') ?: 'preview';
-
-        if ('/' === $uri) {
-            throw new BadRequestHttpException('Empty URI.');
-        }
 
         $interpreter = new HttpRequestInterpreter();
         $inflector = InflectorFactory::create()->build();
         $operationClassBuilderOptions = new OperationClassBuilderOptions();
         $resourceName = $interpreter->getResourceName($uri);
+        // TODO: read main namespace from composer.json psr-4 autoload section
         $namespace = $request->request->getString('namespace', 'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method));
         $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $operationClassBuilderOptions);
         $openApi = new OpenApi([ // TODO: read this info from config if any
@@ -112,6 +117,7 @@ class OpenApiAssistantAction extends AbstractController
                 'payload_classes_code' => $payloadClassesCode,
             ],
             'request' => $request->request->all(),
+            'form' => $form->createView(),
         ]);
     }
 }

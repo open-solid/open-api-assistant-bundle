@@ -52,33 +52,35 @@
         <div class="space-y-4">
             <div class="space-y-4 sm:space-x-4 sm:flex">
                 <div class="mt-4 sm:flex-none">
-                    <label for="endpoint-method" class="block text-sm font-medium leading-6 text-white">Method</label>
+                    <label for="{{ form.method.vars.id }}" class="block text-sm font-medium leading-6 text-white">Method</label>
                     <div class="mt-2">
-                        {% set method = request.method ?? 'POST' %}
-                        <select id="endpoint-method" name="method"
-                                class="block rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black"
-                        >
-                            <option {{ method == 'POST' ? 'selected' }}>POST</option>
-                            <option {{ method == 'GET' ? 'selected' }}>GET</option>
-                            <option {{ method == 'PUT' ? 'selected' }}>PUT</option>
-                            <option {{ method == 'PATCH' ? 'selected' }}>PATCH</option>
-                            <option {{ method == 'DELETE' ? 'selected' }}>DELETE</option>
-                        </select>
+                        {{ form_widget(form.method, {'attr': {'class': 'block rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset ' ~ (form.method.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10') ~ ' focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black'}}) }}
+                        {% for error in form.method.vars.errors %}
+                            <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
+                        {% endfor %}
                     </div>
                 </div>
 
                 <div class="sm:flex-1 sm:grow">
-                    <label for="endpoint-uri" class="block text-sm font-medium leading-6 text-white">URI</label>
+                    <label for="{{ form.uri.vars.id }}" class="block text-sm font-medium leading-6 text-white">URI</label>
                     <div class="mt-2">
-                        <div class="flex rounded-md bg-slate-800 ring-1 ring-inset ring-white/10 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
-                            <label for="endpoint-path"
+                        <div class="flex rounded-md bg-slate-800 ring-1 ring-inset {{ form.uri.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                            <label for="{{ form.uri.vars.id }}"
                                    class="flex select-none items-center pl-3 text-gray-500 sm:text-sm">https://localhost/</label>
-                            <input type="text" autofocus="autofocus" name="uri" autocomplete="off" required
-                                   id="endpoint-uri"
+                            <input type="text"
+                                   autofocus="autofocus"
+                                   name="{{ field_name(form.uri) }}"
+                                   autocomplete="off"
+                                   required
+                                   id="{{ form.uri.vars.id }}"
                                    class="flex-1 border-0 bg-transparent py-1.5 pl-0 text-white focus:ring-0 sm:text-sm sm:leading-6"
                                    placeholder="products"
-                                   value="{{ request.uri ?? '' }}">
+                                   value="{{ field_value(form.uri) }}"
+                            >
                         </div>
+                        {% for error in form.uri.vars.errors %}
+                            <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -86,7 +88,7 @@
             <div class="space-y-4 md:space-y-0 md:space-x-4 md:flex">
                 <div class="md:flex-1">
                     <div class="flex items-center">
-                        <label for="request-payload" class="block text-sm font-medium leading-6 text-white">Request</label>
+                        <label for="{{ form.req.vars.id }}" class="block text-sm font-medium leading-6 text-white">Request</label>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                              class="w-5 h-5 fill-white ml-1 hidden">
                             <path fill-rule="evenodd"
@@ -95,15 +97,21 @@
                         </svg>
                     </div>
                     <div class="mt-2">
-                        <textarea rows="10" name="req" id="request-payload"
-                                  class="block w-full rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                  placeholder="Add your request payload...">{{ request.req ?? '' }}</textarea>
+                        <textarea rows="10"
+                                  name="{{ field_name(form.req) }}"
+                                  id="{{ form.req.vars.id }}"
+                                  class="block w-full rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-indigo-500 {{ form.req.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
+                                  placeholder="Add your request payload..."
+                        >{{ field_value(form.req) }}</textarea>
+                        {% for error in form.req.vars.errors %}
+                            <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
+                        {% endfor %}
                     </div>
                 </div>
 
                 <div class="md:flex-1">
                     <div class="flex items-center">
-                        <label for="response-payload" class="block text-sm font-medium leading-6 text-white">Response</label>
+                        <label for="{{ form.res.vars.id }}" class="block text-sm font-medium leading-6 text-white">Response</label>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                              class="w-5 h-5 fill-white ml-1 hidden">
                             <path fill-rule="evenodd"
@@ -112,9 +120,15 @@
                         </svg>
                     </div>
                     <div class="mt-2">
-                        <textarea rows="10" name="res" id="response-payload"
-                                  class="block w-full rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                  placeholder="Add your response payload...">{{ request.res ?? '' }}</textarea>
+                        <textarea rows="10"
+                                  name="{{ field_name(form.res) }}"
+                                  id="{{ form.res.vars.id }}"
+                                  class="block w-full rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-indigo-500 {{ form.res.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
+                                  placeholder="Add your response payload..."
+                        >{{ field_value(form.res) }}</textarea>
+                        {% for error in form.res.vars.errors %}
+                            <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
