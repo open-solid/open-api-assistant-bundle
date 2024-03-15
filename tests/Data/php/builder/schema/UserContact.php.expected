@@ -6,7 +6,7 @@ use OpenApi\Attributes\Schema;
 use OpenSolid\OpenApiBundle\Attribute\Property;
 
 #[Schema]
-readonly class UserContact
+final readonly class UserContact
 {
     #[Property(format: 'email', example: 'john.doe@example.com')]
     public string $email;

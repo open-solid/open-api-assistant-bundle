@@ -32,6 +32,7 @@ components:
           format: int32
           example: 45
       type: object
+      writeOnly: true
     PatchUserView:
       properties:
         id:
@@ -50,3 +51,4 @@ components:
           format: date-time
           example: '2023-12-25T14:30:00'
       type: object
+      readOnly: true

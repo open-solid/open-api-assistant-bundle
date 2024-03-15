@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class OpenApiAssistantAction extends AbstractController
 {
-    public function index(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         if (!$request->isMethod('POST')) {
             return $this->render('@OpenApiAssistant/assistant.html.twig');
@@ -35,12 +35,14 @@ class OpenApiAssistantAction extends AbstractController
         $uri = '/'.strtolower(trim($request->request->getString('uri'), '/'));
         $req = $request->request->getString('req') ?: null;
         $res = $request->request->getString('res') ?: null;
+        $action = $request->request->getString('action') ?: 'preview';
 
         if ('/' === $uri) {
             throw new BadRequestHttpException('Empty URI.');
         }
 
-        $namespace = $request->request->getString('namespace', 'App\\'.$interpreter->getResourceName($uri).'\\Controller\\'.$inflector->classify($method));
+        $resourceName = $interpreter->getResourceName($uri);
+        $namespace = $request->request->getString('namespace', 'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method));
 
         $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter);
         $operationBuilder->build($method, $uri, $req, $res, $openApi);
@@ -78,16 +80,26 @@ class OpenApiAssistantAction extends AbstractController
             }
         }
 
+        if ('generate' === $action) {
+            $dir = dirname(__DIR__, 2).sprintf('/demo/src/%s/Controller/%s', $resourceName, ucfirst($method));
+            if (!is_dir($dir) && !mkdir($dir, recursive: true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
+            }
+            file_put_contents($dir.sprintf('/%s.php', 'PostProductAction'), $controllerCode);
+            foreach ($payloadClassesCode as $name => $classCode) {
+                file_put_contents($dir.sprintf('/%s.php', $name), $classCode);
+            }
+
+            $this->addFlash('success', 'Your code has been successfully generated and saved in your files.');
+
+            return $this->redirectToRoute('openapi_assistant');
+        }
+
         return $this->render('@OpenApiAssistant/assistant.html.twig', [
             'openapi' => $openApi->toYaml(),
             'controller_code' => $controllerCode,
             'payload_classes_code' => $payloadClassesCode,
             'request' => $request->request->all(),
         ]);
-    }
-
-    public function generate(Request $request): Response
-    {
-        return $this->render('@OpenApiAssistant/assistant.html.twig');
     }
 }

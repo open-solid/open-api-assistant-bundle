@@ -5,7 +5,7 @@ namespace Api\User\Controller\Post;
 use OpenSolid\OpenApiBundle\Attribute\Body;
 use OpenSolid\OpenApiBundle\Routing\Attribute\Post;
 
-class PostUserAction
+final class PostUserAction
 {
     #[Post('/users')]
     public function __invoke(#[Body] PostUserBody $body): PostUserView

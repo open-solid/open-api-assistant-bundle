@@ -63,6 +63,7 @@ readonly class SchemaClassBuilder
 
         $classStmt = $this->builder->class($schema->schema)
             ->setDocComment('')
+            ->makeFinal()
             ->addAttribute($this->builder->attribute('Schema', $schemaAttrArgs))
             ->addStmts($properties)
         ;

@@ -7,7 +7,7 @@ use OpenApi\Attributes\Schema;
 use OpenSolid\OpenApiBundle\Attribute\Property;
 
 #[Schema]
-class User
+final class User
 {
     #[Property(format: 'uuid', example: 'f15fe4c1-e1e6-4c66-9857-fa320a8d0274')]
     public string $id;

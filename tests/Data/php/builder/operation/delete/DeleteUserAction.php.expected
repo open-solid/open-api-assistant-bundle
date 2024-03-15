@@ -5,7 +5,7 @@ namespace Api\User\Controller\Delete;
 use OpenSolid\OpenApiBundle\Attribute\Path;
 use OpenSolid\OpenApiBundle\Routing\Attribute\Delete;
 
-class DeleteUserAction
+final class DeleteUserAction
 {
     #[Delete('/users/{id}')]
     public function __invoke(#[Path] string $id): void

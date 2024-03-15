@@ -28,3 +28,4 @@ components:
           format: int32
           example: 40
       type: object
+      readOnly: true

@@ -49,6 +49,12 @@ final readonly class SchemaBuilder
             throw new \InvalidArgumentException(sprintf('Unsupported type "%s"', gettype($payload)));
         }
 
+        if ($options['writeOnly'] ?? false) {
+            $schema->writeOnly = true;
+        } elseif ($options['readOnly'] ?? false) {
+            $schema->readOnly = true;
+        }
+
         foreach ($payload as $key => $value) {
             if ('array' === $schema->type) {
                 if (is_scalar($value)) {

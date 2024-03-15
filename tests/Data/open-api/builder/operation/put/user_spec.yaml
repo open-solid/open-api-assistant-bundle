@@ -35,6 +35,7 @@ components:
           format: int32
           example: 40
       type: object
+      writeOnly: true
     PutUserView:
       properties:
         id:
@@ -53,3 +54,4 @@ components:
           format: date-time
           example: '2023-12-25T14:30:00'
       type: object
+      readOnly: true

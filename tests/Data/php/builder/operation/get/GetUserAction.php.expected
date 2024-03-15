@@ -5,7 +5,7 @@ namespace Api\User\Controller\Get;
 use OpenSolid\OpenApiBundle\Attribute\Path;
 use OpenSolid\OpenApiBundle\Routing\Attribute\Get;
 
-class GetUserAction
+final class GetUserAction
 {
     #[Get('/users/{id}')]
     public function __invoke(#[Path] string $id): GetUserView

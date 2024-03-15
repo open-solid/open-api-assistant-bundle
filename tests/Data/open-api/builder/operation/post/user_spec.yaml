@@ -28,6 +28,7 @@ components:
           format: int32
           example: 40
       type: object
+      writeOnly: true
     PostUserView:
       properties:
         id:
@@ -42,3 +43,4 @@ components:
           format: int32
           example: 40
       type: object
+      readOnly: true

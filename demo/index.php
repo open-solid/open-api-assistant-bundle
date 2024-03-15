@@ -27,12 +27,18 @@ class Application extends Kernel
 
     protected function configureContainer(ContainerConfigurator $container): void
     {
-        // PHP equivalent of config/packages/framework.yaml
         $container->extension('framework', [
             'secret' => 'S0ME_SECRET',
             'router' => [
-                'resource' => dirname(__DIR__).'/config/routes.php',
+                'resource' => __DIR__.'/config/routes.php',
                 'type' => 'php',
+            ],
+            'session' => true,
+        ]);
+
+        $container->extension('openapi', [
+            'paths' => [
+                '%kernel.project_dir%/config/openapi.yaml',
             ],
         ]);
     }

@@ -28,8 +28,14 @@ final readonly class OperationBuilder
         private SchemaBuilder $schemaBuilder,
         private HttpRequestInterpreter $httpInterpreter,
         private array $options = [
-            'request' => ['suffix' => 'Body'],
-            'response' => ['suffix' => 'View'],
+            'request' => [
+                'suffix' => 'Body',
+                'writeOnly' => true,
+            ],
+            'response' => [
+                'suffix' => 'View',
+                'readOnly' => true,
+            ],
         ],
     ) {
         $this->inflector = InflectorFactory::create()->build();

@@ -6,7 +6,7 @@ use OpenApi\Attributes\Schema;
 use OpenSolid\OpenApiBundle\Attribute\Property;
 
 #[Schema(writeOnly: true)]
-class UserAddress
+final class UserAddress
 {
     #[Property(example: '123 Main St')]
     public string $street;

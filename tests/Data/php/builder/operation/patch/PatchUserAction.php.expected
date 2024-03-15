@@ -6,7 +6,7 @@ use OpenSolid\OpenApiBundle\Attribute\Body;
 use OpenSolid\OpenApiBundle\Attribute\Path;
 use OpenSolid\OpenApiBundle\Routing\Attribute\Patch;
 
-class PatchUserAction
+final class PatchUserAction
 {
     #[Patch('/users/{id}')]
     public function __invoke(#[Path] string $id, #[Body] PatchUserBody $body): PatchUserView
