@@ -140,22 +140,22 @@
     </div>
 
     <div class="container mx-auto max-w-5xl px-5 space-y-4 pb-10">
-        {% if openapi is defined %}
+        {% if preview.openapi_spec is defined %}
             <div>
                 <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">OpenAPI.yaml</div>
-                <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-yaml">{{ openapi }}</code></pre>
+                <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-yaml">{{ preview.openapi_spec }}</code></pre>
             </div>
         {% endif %}
 
-        {% if controller_code is defined %}
+        {% if preview.controller_code is defined %}
             <div>
-                <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">{{ controller_class_name }}.php</div>
-                <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-php">{{ controller_code }}</code></pre>
+                <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">{{ preview.controller_class_name }}.php</div>
+                <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-php">{{ preview.controller_code }}</code></pre>
             </div>
         {% endif %}
 
-        {% if payload_classes_code is defined %}
-            {% for name, payload_code in payload_classes_code %}
+        {% if preview.payload_classes_code is defined %}
+            {% for name, payload_code in preview.payload_classes_code %}
                 <div>
                     <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">{{ name }}.php</div>
                     <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-php">{{ payload_code }}</code></pre>
@@ -163,7 +163,7 @@
             {% endfor %}
         {% endif %}
 
-        {% if openapi is defined %}
+        {% if preview.openapi_spec is defined %}
             <button type="submit"
                     name="action"
                     value="generate"

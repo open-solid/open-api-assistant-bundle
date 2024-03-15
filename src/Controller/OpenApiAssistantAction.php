@@ -25,14 +25,7 @@ class OpenApiAssistantAction extends AbstractController
             return $this->render('@OpenApiAssistant/assistant.html.twig');
         }
 
-        $interpreter = new HttpRequestInterpreter();
-        $operationClassBuilderOptions = new OperationClassBuilderOptions();
-        $inflector = InflectorFactory::create()->build();
-
-        $openApi = new OpenApi([
-            'openapi' => '3.1.0',
-            'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
-        ]);
+        // TODO: validate request
         $method = strtolower($request->request->getString('method'));
         $uri = '/'.strtolower(trim($request->request->getString('uri'), '/'));
         $req = $request->request->getString('req') ?: null;
@@ -43,11 +36,16 @@ class OpenApiAssistantAction extends AbstractController
             throw new BadRequestHttpException('Empty URI.');
         }
 
+        $interpreter = new HttpRequestInterpreter();
+        $inflector = InflectorFactory::create()->build();
+        $operationClassBuilderOptions = new OperationClassBuilderOptions();
         $resourceName = $interpreter->getResourceName($uri);
-        $namespace = $request->request->getString(
-            'namespace',
-            'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method)
-        );
+        $namespace = $request->request->getString('namespace', 'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method));
+        $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $operationClassBuilderOptions);
+        $openApi = new OpenApi([ // TODO: read this info from config if any
+            'openapi' => '3.1.0',
+            'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
+        ]);
 
         // build Open API Spec
         $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter);
@@ -56,12 +54,6 @@ class OpenApiAssistantAction extends AbstractController
         if (!$openApi->validate()) {
             throw new BadRequestHttpException('Invalid specs.');
         }
-
-        $operationClassBuilder = new OperationClassBuilder(
-            $interpreter,
-            'application/json',
-            $operationClassBuilderOptions,
-        );
 
         // generate controller content
         $controllerClassName = '';
@@ -113,10 +105,12 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         return $this->render('@OpenApiAssistant/assistant.html.twig', [
-            'openapi' => $openApi->toYaml(),
-            'controller_class_name' => $controllerClassName,
-            'controller_code' => $controllerCode,
-            'payload_classes_code' => $payloadClassesCode,
+            'preview' => [
+                'openapi_spec' => $openApi->toYaml(),
+                'controller_class_name' => $controllerClassName,
+                'controller_code' => $controllerCode,
+                'payload_classes_code' => $payloadClassesCode,
+            ],
             'request' => $request->request->all(),
         ]);
     }
