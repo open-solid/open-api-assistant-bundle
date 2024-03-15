@@ -104,7 +104,10 @@ class OpenApiAssistantAction extends AbstractController
                 file_put_contents($dir.sprintf('/%s.php', $name), $classCode);
             }
 
-            $this->addFlash('success', 'Your code has been successfully generated and saved in your files.');
+            $this->addFlash('success', [
+                'title' => 'Successfully generated!',
+                'body' => 'Your new classes has been saved as files.',
+            ]);
 
             return $this->redirectToRoute('openapi_assistant');
         }
