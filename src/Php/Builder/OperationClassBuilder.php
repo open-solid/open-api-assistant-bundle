@@ -24,7 +24,7 @@ readonly class OperationClassBuilder
     public function __construct(
         private HttpRequestInterpreter $httpInterpreter,
         private string $contentType = 'application/json',
-        private array $options = ['suffix' => 'Action'],
+        private OperationClassBuilderOptions $options = new OperationClassBuilderOptions(),
     ) {
         $this->inflector = InflectorFactory::create()->build();
         $this->builder = new BuilderFactory();
@@ -35,7 +35,7 @@ readonly class OperationClassBuilder
     {
         $rootNode = $this->builder->namespace($namespace);
         $resourceName = $this->httpInterpreter->getResourceName($uri);
-        $className = $this->inflector->classify($operation->method.' '.$resourceName.' '.$this->options['suffix']);
+        $className = $this->inflector->classify($operation->method.' '.$resourceName.' '.$this->options->suffix);
         $routeAttrName = $this->inflector->classify($operation->method);
 
         $useStmts = [

@@ -25,7 +25,7 @@ final readonly class SchemaBuilder
     /**
      * @throws JsonException
      */
-    public function build(string $name, string $payload, OpenApi $openApi, array $options = []): void
+    public function build(string $name, string $payload, OpenApi $openApi, SchemaBuilderOptions $options = new SchemaBuilderOptions()): void
     {
         if (Generator::isDefault($openApi->components)) {
             $openApi->components = new Components([]);
@@ -35,7 +35,7 @@ final readonly class SchemaBuilder
         $this->process($name, json_decode($payload, flags: JSON_THROW_ON_ERROR), $openApi->components, $options);
     }
 
-    protected function process(string $name, mixed $payload, Components $components, array $options): Schema
+    protected function process(string $name, mixed $payload, Components $components, SchemaBuilderOptions $options): Schema
     {
         $schemaName = ucfirst($name);
 
@@ -49,9 +49,9 @@ final readonly class SchemaBuilder
             throw new \InvalidArgumentException(sprintf('Unsupported type "%s"', gettype($payload)));
         }
 
-        if ($options['writeOnly'] ?? false) {
+        if ($options->writeOnly) {
             $schema->writeOnly = true;
-        } elseif ($options['readOnly'] ?? false) {
+        } elseif ($options->readOnly) {
             $schema->readOnly = true;
         }
 
@@ -126,9 +126,9 @@ final readonly class SchemaBuilder
         return $schema;
     }
 
-    private function buildSchemaName(string $firstName, string $lastName, array $options): string
+    private function buildSchemaName(string $firstName, string $lastName, SchemaBuilderOptions $options): string
     {
-        if (isset($options['suffix'])) {
+        if ('' !== $options->suffix) {
             $firstName = substr($firstName, 0, -strlen($options['suffix']));
         }
 
