@@ -21,7 +21,7 @@ class NewEndpointType extends AbstractType
                     'PATCH' => 'PATCH',
                     'DELETE' => 'DELETE',
                 ],
-                'invalid_message' => 'The selected method is invalid.',
+                'invalid_message' => 'Please select a valid method.',
             ])
             ->add('uri')
             ->add('req')

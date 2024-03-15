@@ -32,7 +32,7 @@ class OpenApiAssistantAction extends AbstractController
             if ($form->getErrors(true)->count() > 0) {
                 $this->addFlash('error', new FlashMessage(
                     title: 'Validation failed!',
-                    body: 'Oops! It looks like there was an error with the data you entered. Please check the form and try again.',
+                    body: 'Oops! It looks like there was an error with the data you entered. Please check the form errors and try again.',
                 ));
             }
 
