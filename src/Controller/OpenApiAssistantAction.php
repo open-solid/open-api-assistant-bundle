@@ -3,6 +3,7 @@
 namespace OpenSolid\OpenApiAssistantBundle\Controller;
 
 use Doctrine\Inflector\InflectorFactory;
+use Exception;
 use OpenApi\Annotations\Info;
 use OpenApi\Annotations\OpenApi;
 use OpenApi\Generator;
@@ -16,6 +17,7 @@ use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilderOptions;
 use OpenSolid\OpenApiAssistantBundle\Php\Builder\SchemaClassBuilder;
 use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -63,11 +65,15 @@ class OpenApiAssistantAction extends AbstractController
         $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter);
         $operationBuilder->build($method, $uri, $req, $res, $openApi);
 
-        if (!$openApi->validate()) {
+        try {
+            $openApi->validate();
+        } catch (Exception $e) {
             $this->addFlash('error', new FlashMessage(
                 title: 'Validation failed!',
                 body: 'Something went wrong generating the OpenAPI Spec.',
             ));
+
+            $form->addError(new FormError($e->getMessage()));
 
             return $this->render('@OpenApiAssistant/assistant.html.twig', [
                 'form' => $form->createView(),
