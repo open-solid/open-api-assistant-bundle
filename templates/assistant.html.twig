@@ -179,17 +179,54 @@
     <div class="container mx-auto max-w-5xl px-5 space-y-4 pb-10">
         {% if preview.openapi_spec is defined %}
             <div>
-                <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">OpenAPI.yaml</div>
-                <pre><code class="rounded-tl-none rounded-md bg-slate-800 language-yaml">{{ preview.openapi_spec }}</code></pre>
+                <h2 class="text-base font-semibold leading-7 text-white mt-6">OpenAPI Specification Preview</h2>
+                <p class="mb-1 text-sm leading-6 text-slate-400">Generated from your endpoint data.</p>
+            </div>
+
+            <div>
+                <nav class="flex border-b border-slate-800" aria-label="Tabs">
+                    <ul role="tablist" class="flex min-w-full flex-none gap-x-1 text-sm leading-6 text-slate-400">
+                        <li>
+                            <a id="tab-0"
+                               role="tab"
+                               class="cursor-pointer aria-selected:text-white hover:text-slate-300 border-b-2 border-transparent aria-selected:border-indigo-500 py-3 px-3 inline-block"
+                               aria-selected="true"
+                               aria-controls="tabpanel-0"
+                            >openapi.yaml</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div id="tabpanel-0"
+                     role="tabpanel"
+                     tabindex="0"
+                     aria-labelledby="tab-0"
+                     class="flex items-start bg-slate-800/60"
+                >
+                    <div aria-hidden="true" class="select-none border-r border-slate-300/5 px-4 font-mono text-slate-600 text-sm leading-6 pt-3.5">
+                        {% for ln in 1..(preview.openapi_spec.yaml|split('\n')|length) %}
+                            {{ ln|length < 2 ? '0' ~ ln : ln }}<br>
+                        {% endfor %}
+                    </div>
+                    <pre><code class="rounded-tl-none rounded-md bg-transparent language-yaml">{{ preview.openapi_spec.yaml }}</code></pre>
+                </div>
             </div>
         {% endif %}
 
         {% if preview.classes_code is defined %}
+            <div class="container mx-auto max-w-5xl">
+                <hr class="border-slate-800 my-6">
+            </div>
+
+            <div>
+                <h2 class="text-base font-semibold leading-7 text-white mt-6">PHP Code Preview</h2>
+                <p class="mb-1 text-sm leading-6 text-slate-400">Generated from your OpenAPI specification.</p>
+            </div>
+
             <div class="tabs">
                 <div class="mx-auto max-w-7xl">
                     <div class="sm:hidden">
                         <label for="tabs" class="sr-only">Select a tab</label>
-                        <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
+                        <!-- TODO: Use an "onChange" listener to redirect the user to the selected tab URL. -->
                         <select id="tabs" class="block w-full rounded-md border-none bg-slate/5 py-2 pl-3 pr-10 text-base text-white shadow-sm ring-1 ring-inset ring-slate/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm">
                             {% for name, class_code in preview.classes_code %}
                                 <option {{ loop.first ? 'selected' }}>{{ name }}.php</option>
@@ -201,11 +238,11 @@
                             <ul role="tablist" class="flex min-w-full flex-none gap-x-1 text-sm leading-6 text-slate-400">
                                 {% for name, class_code in preview.classes_code %}
                                     <li>
-                                        <a id="tab-{{ loop.index }}"
+                                        <a id="tab-class-{{ loop.index }}"
                                            role="tab"
                                            class="cursor-pointer aria-selected:text-white hover:text-slate-300 border-b-2 border-transparent aria-selected:border-indigo-500 py-3 px-3 inline-block"
                                            aria-selected="{{ loop.first ? 'true' : 'false' }}"
-                                           aria-controls="tabpanel-{{ loop.index }}"
+                                           aria-controls="tabpanel-class-{{ loop.index }}"
                                            {% if not loop.first %}tabindex="-1"{% endif %}
                                         >{{ name }}.php</a>
                                     </li>
@@ -216,15 +253,16 @@
                 </div>
                 <div class="tabs-content">
                     {% for name, class_code in preview.classes_code %}
-                        <div id="tabpanel-{{ loop.index }}"
+                        <div id="tabpanel-class-{{ loop.index }}"
                              role="tabpanel"
                              tabindex="0"
-                             aria-labelledby="tab-{{ loop.index }}"
+                             aria-labelledby="tab-class-{{ loop.index }}"
                              class="flex items-start {{ not loop.first ? 'hidden' }} bg-slate-800/60"
                         >
+                            {% set code_lines = class_code|split('\n')|length + 1 %}
                             <div aria-hidden="true" class="select-none border-r border-slate-300/5 px-4 font-mono text-slate-600 text-sm leading-6 pt-3.5">
-                                {% for ln in 1..preview.line_numbers.max %}
-                                    {% if ln <= preview.line_numbers.perCode[name] %}
+                                {% for ln in 1..preview.line_numbers %}
+                                    {% if ln <= code_lines %}
                                         {{ ln|length < 2 ? '0' ~ ln : ln }}
                                     {% else %}
                                         {{ ' ' }}
@@ -245,9 +283,9 @@
                     value="save"
                     class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="-ml-0.5 h-5 w-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                 </svg>
-                Save
+                Save All
             </button>
         {% endif %}
     </div>

@@ -82,10 +82,7 @@ class OpenApiAssistantAction extends AbstractController
 
         // generate controller content
         $classesCode = [];
-        $lineNumbers = [
-            'max' => 0,
-            'perCode' => [],
-        ];
+        $lineNumbers = 0;
         foreach ($openApi->paths as $pathItem) {
             if (!Generator::isDefault($pathItem->post)) {
                 $operation = $pathItem->post;
@@ -103,8 +100,7 @@ class OpenApiAssistantAction extends AbstractController
 
             $controllerClassName = $inflector->classify($operation->method.' '.$resourceName.' '.$operationClassBuilderOptions->suffix);
             $classesCode[$controllerClassName] = $controllerCode = $operationClassBuilder->build($namespace, $operation, $uri);
-            $lineNumbers['perCode'][$controllerClassName] = substr_count($controllerCode, "\n") + 2;
-            $lineNumbers['max'] = max($lineNumbers['max'], $lineNumbers['perCode'][$controllerClassName]);
+            $lineNumbers = max($lineNumbers, substr_count($controllerCode, "\n") + 2);
         }
 
         // generate payloads content
@@ -112,8 +108,7 @@ class OpenApiAssistantAction extends AbstractController
             $schemaClassBuilder = new SchemaClassBuilder();
             foreach ($openApi->components->schemas as $schema) {
                 $classesCode[$schema->schema] = $classCode = $schemaClassBuilder->build($namespace, $schema);
-                $lineNumbers['perCode'][$schema->schema] = substr_count($classCode, "\n") + 2;
-                $lineNumbers['max'] = max($lineNumbers['max'], $lineNumbers['perCode'][$schema->schema]);
+                $lineNumbers = max($lineNumbers, substr_count($classCode, "\n") + 2);
             }
         }
 
@@ -136,7 +131,10 @@ class OpenApiAssistantAction extends AbstractController
 
         return $this->render('@OpenApiAssistant/assistant.html.twig', [
             'preview' => [
-                'openapi_spec' => $openApi->toYaml(),
+                'openapi_spec' => [
+                    'yaml' => $openApi->toYaml(),
+                    'json' => $openApi->toJson(),
+                ],
                 'classes_code' => $classesCode,
                 'line_numbers' => $lineNumbers,
             ],
