@@ -81,8 +81,11 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         // generate controller content
-        $controllerClassName = '';
-        $controllerCode = '';
+        $classesCode = [];
+        $lineNumbers = [
+            'max' => 0,
+            'perCode' => [],
+        ];
         foreach ($openApi->paths as $pathItem) {
             if (!Generator::isDefault($pathItem->post)) {
                 $operation = $pathItem->post;
@@ -99,25 +102,27 @@ class OpenApiAssistantAction extends AbstractController
             }
 
             $controllerClassName = $inflector->classify($operation->method.' '.$resourceName.' '.$operationClassBuilderOptions->suffix);
-            $controllerCode = $operationClassBuilder->build($namespace, $operation, $uri);
+            $classesCode[$controllerClassName] = $controllerCode = $operationClassBuilder->build($namespace, $operation, $uri);
+            $lineNumbers['perCode'][$controllerClassName] = substr_count($controllerCode, "\n") + 2;
+            $lineNumbers['max'] = max($lineNumbers['max'], $lineNumbers['perCode'][$controllerClassName]);
         }
 
         // generate payloads content
-        $payloadClassesCode = [];
         if (!Generator::isDefault($openApi->components)) {
             $schemaClassBuilder = new SchemaClassBuilder();
             foreach ($openApi->components->schemas as $schema) {
-                $payloadClassesCode[$schema->schema] = $schemaClassBuilder->build($namespace, $schema);
+                $classesCode[$schema->schema] = $classCode = $schemaClassBuilder->build($namespace, $schema);
+                $lineNumbers['perCode'][$schema->schema] = substr_count($classCode, "\n") + 2;
+                $lineNumbers['max'] = max($lineNumbers['max'], $lineNumbers['perCode'][$schema->schema]);
             }
         }
 
-        if ('generate' === $action) {
+        if ('save' === $action) {
             $dir = dirname(__DIR__, 2).sprintf('/demo/src/%s/Controller/%s', $resourceName, $inflector->classify($method));
             if (!is_dir($dir) && !mkdir($dir, recursive: true) && !is_dir($dir)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
             }
-            file_put_contents($dir.sprintf('/%s.php', $controllerClassName), $controllerCode);
-            foreach ($payloadClassesCode as $name => $classCode) {
+            foreach ($classesCode as $name => $classCode) {
                 file_put_contents($dir.sprintf('/%s.php', $name), $classCode);
             }
 
@@ -132,9 +137,8 @@ class OpenApiAssistantAction extends AbstractController
         return $this->render('@OpenApiAssistant/assistant.html.twig', [
             'preview' => [
                 'openapi_spec' => $openApi->toYaml(),
-                'controller_class_name' => $controllerClassName,
-                'controller_code' => $controllerCode,
-                'payload_classes_code' => $payloadClassesCode,
+                'classes_code' => $classesCode,
+                'line_numbers' => $lineNumbers,
             ],
             'request' => $request->request->all(),
             'form' => $form->createView(),

@@ -180,35 +180,74 @@
         {% if preview.openapi_spec is defined %}
             <div>
                 <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">OpenAPI.yaml</div>
-                <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-yaml">{{ preview.openapi_spec }}</code></pre>
+                <pre><code class="rounded-tl-none rounded-md bg-slate-800 language-yaml">{{ preview.openapi_spec }}</code></pre>
             </div>
         {% endif %}
 
-        {% if preview.controller_code is defined %}
-            <div>
-                <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">{{ preview.controller_class_name }}.php</div>
-                <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-php">{{ preview.controller_code }}</code></pre>
-            </div>
-        {% endif %}
-
-        {% if preview.payload_classes_code is defined %}
-            {% for name, payload_code in preview.payload_classes_code %}
-                <div>
-                    <div class="text-slate-300 px-3 py-2 inline-block bg-slate-800 rounded-t-md">{{ name }}.php</div>
-                    <pre class="text-sm"><code class="rounded-tl-none rounded-md bg-slate-800 language-php">{{ payload_code }}</code></pre>
+        {% if preview.classes_code is defined %}
+            <div class="tabs">
+                <div class="mx-auto max-w-7xl">
+                    <div class="sm:hidden">
+                        <label for="tabs" class="sr-only">Select a tab</label>
+                        <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
+                        <select id="tabs" class="block w-full rounded-md border-none bg-slate/5 py-2 pl-3 pr-10 text-base text-white shadow-sm ring-1 ring-inset ring-slate/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm">
+                            {% for name, class_code in preview.classes_code %}
+                                <option {{ loop.first ? 'selected' }}>{{ name }}.php</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="hidden sm:block">
+                        <nav class="flex border-b border-slate-800" aria-label="Tabs">
+                            <ul role="tablist" class="flex min-w-full flex-none gap-x-1 text-sm leading-6 text-slate-400">
+                                {% for name, class_code in preview.classes_code %}
+                                    <li>
+                                        <a id="tab-{{ loop.index }}"
+                                           role="tab"
+                                           class="cursor-pointer aria-selected:text-white hover:text-slate-300 border-b-2 border-transparent aria-selected:border-indigo-500 py-3 px-3 inline-block"
+                                           aria-selected="{{ loop.first ? 'true' : 'false' }}"
+                                           aria-controls="tabpanel-{{ loop.index }}"
+                                           {% if not loop.first %}tabindex="-1"{% endif %}
+                                        >{{ name }}.php</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
-            {% endfor %}
+                <div class="tabs-content">
+                    {% for name, class_code in preview.classes_code %}
+                        <div id="tabpanel-{{ loop.index }}"
+                             role="tabpanel"
+                             tabindex="0"
+                             aria-labelledby="tab-{{ loop.index }}"
+                             class="flex items-start {{ not loop.first ? 'hidden' }} bg-slate-800/60"
+                        >
+                            <div aria-hidden="true" class="select-none border-r border-slate-300/5 px-4 font-mono text-slate-600 text-sm leading-6 pt-3.5">
+                                {% for ln in 1..preview.line_numbers.max %}
+                                    {% if ln <= preview.line_numbers.perCode[name] %}
+                                        {{ ln|length < 2 ? '0' ~ ln : ln }}
+                                    {% else %}
+                                        {{ ' ' }}
+                                    {% endif %}
+                                    <br>
+                                {% endfor %}
+                            </div>
+                            <pre><code class="rounded-tl-none rounded-md bg-transparent language-php">{{ class_code }}</code></pre>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         {% endif %}
 
         {% if preview.openapi_spec is defined %}
             <button type="submit"
                     name="action"
-                    value="generate"
+                    value="save"
                     class="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="-ml-0.5 h-5 w-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
                 </svg>
-                Generate
+                Save
             </button>
         {% endif %}
     </div>
@@ -253,24 +292,136 @@
 </div>
 
 <script>
+    'use strict'
+
+    class TabsAutomatic {
+        constructor(groupNode) {
+            this.tablistNode = groupNode
+
+            this.tabs = []
+
+            this.firstTab = null
+            this.lastTab = null
+
+            this.tabs = Array.from(this.tablistNode.querySelectorAll('[role=tab]'))
+            this.tabpanels = []
+
+            for (let i = 0; i < this.tabs.length; i += 1) {
+                const tab = this.tabs[i]
+                const tabpanel = document.getElementById(tab.getAttribute('aria-controls'))
+
+                tab.tabIndex = -1
+                tab.setAttribute('aria-selected', 'false')
+                this.tabpanels.push(tabpanel)
+
+                tab.addEventListener('keydown', this.onKeydown.bind(this))
+                tab.addEventListener('click', this.onClick.bind(this))
+
+                if (!this.firstTab) {
+                    this.firstTab = tab
+                }
+                this.lastTab = tab
+            }
+
+            this.setSelectedTab(this.firstTab, false)
+        }
+
+        setSelectedTab(currentTab, setFocus) {
+            if (typeof setFocus !== 'boolean') {
+                setFocus = true
+            }
+            for (let i = 0; i < this.tabs.length; i += 1) {
+                const tab = this.tabs[i]
+                if (currentTab === tab) {
+                    tab.setAttribute('aria-selected', 'true')
+                    tab.removeAttribute('tabindex')
+                    this.tabpanels[i].classList.remove('hidden')
+                    if (setFocus) {
+                        tab.focus()
+                    }
+                } else {
+                    tab.setAttribute('aria-selected', 'false')
+                    tab.tabIndex = -1
+                    this.tabpanels[i].classList.add('hidden')
+                }
+            }
+        }
+
+        setSelectedToPreviousTab(currentTab) {
+            if (currentTab === this.firstTab) {
+                this.setSelectedTab(this.lastTab)
+            } else {
+                const index = this.tabs.indexOf(currentTab)
+                this.setSelectedTab(this.tabs[index - 1])
+            }
+        }
+
+        setSelectedToNextTab(currentTab) {
+            if (currentTab === this.lastTab) {
+                this.setSelectedTab(this.firstTab)
+            } else {
+                const index = this.tabs.indexOf(currentTab)
+                this.setSelectedTab(this.tabs[index + 1])
+            }
+        }
+
+        /* EVENT HANDLERS */
+
+        onKeydown(event) {
+            const tgt = event.currentTarget
+            let flag = false
+
+            switch (event.key) {
+                case 'ArrowLeft':
+                    this.setSelectedToPreviousTab(tgt)
+                    flag = true
+                    break
+
+                case 'ArrowRight':
+                    this.setSelectedToNextTab(tgt)
+                    flag = true
+                    break
+
+                case 'Home':
+                    this.setSelectedTab(this.firstTab)
+                    flag = true
+                    break
+
+                case 'End':
+                    this.setSelectedTab(this.lastTab)
+                    flag = true
+                    break
+
+                default:
+                    break
+            }
+
+            if (flag) {
+                event.stopPropagation()
+                event.preventDefault()
+            }
+        }
+
+        onClick(event) {
+            this.setSelectedTab(event.currentTarget)
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         hljs.highlightAll()
 
-        const closeFlashButton = document.querySelector('#close-flash-button');
+        const tablists = document.querySelectorAll('[role=tablist]')
+        for (let i = 0; i < tablists.length; i++) {
+            new TabsAutomatic(tablists[i])
+        }
+
+        const closeFlashButton = document.querySelector('#close-flash-button')
         if (closeFlashButton) {
-            <!--
-              Entering: "transform ease-out duration-300 transition"
-                From: "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-                To: "translate-y-0 opacity-100 sm:translate-x-0"
-              Leaving: "transition ease-in duration-100"
-                From: "opacity-100"
-                To: "opacity-0"
-            -->
-            const flashBox = closeFlashButton.closest('.pointer-events-auto');
+            const flashBox = closeFlashButton.closest('.pointer-events-auto')
 
             // Entering
-            flashBox.classList.remove('translate-y-2', 'opacity-0', 'sm:translate-x-2');
-            flashBox.classList.add('translate-y-0', 'opacity-100', 'sm:translate-x-0');
+            flashBox.classList.remove('translate-y-2', 'opacity-0', 'sm:translate-x-2')
+            flashBox.classList.add('translate-y-0', 'opacity-100', 'sm:translate-x-0')
 
             flashBox.addEventListener('transitionend', function () {
                 if (this.classList.contains('opacity-0')) {
@@ -280,8 +431,8 @@
 
             closeFlashButton.addEventListener('click', function () {
                 // Leaving
-                flashBox.classList.remove('transform', 'translate-y-0', 'ease-out', 'opacity-100', 'duration-300', 'sm:translate-y-0', 'sm:translate-x-0');
-                flashBox.classList.add('ease-in', 'duration-100', 'opacity-0');
+                flashBox.classList.remove('transform', 'translate-y-0', 'ease-out', 'opacity-100', 'duration-300', 'sm:translate-y-0', 'sm:translate-x-0')
+                flashBox.classList.add('ease-in', 'duration-100', 'opacity-0')
             })
         }
     })
