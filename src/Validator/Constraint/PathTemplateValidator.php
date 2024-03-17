@@ -18,6 +18,10 @@ class PathTemplateValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, PathTemplate::class);
         }
 
+        if (null === $value || '' === $value) {
+            return;
+        }
+
         // Check path template.
         if (!preg_match(self::PATTERN, $value)) {
             $this->context->addViolation($constraint->invalidPathMessage);
