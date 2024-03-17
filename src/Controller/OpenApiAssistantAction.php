@@ -38,7 +38,7 @@ class OpenApiAssistantAction extends AbstractController
                 ));
             }
 
-            return $this->render('@OpenApiAssistant/assistant.html.twig', [
+            return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
                 'form' => $form->createView(),
             ]);
         }
@@ -75,7 +75,7 @@ class OpenApiAssistantAction extends AbstractController
 
             $form->addError(new FormError($e->getMessage()));
 
-            return $this->render('@OpenApiAssistant/assistant.html.twig', [
+            return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
                 'form' => $form->createView(),
             ]);
         }
@@ -129,7 +129,7 @@ class OpenApiAssistantAction extends AbstractController
             return $this->redirectToRoute('openapi_assistant');
         }
 
-        return $this->render('@OpenApiAssistant/assistant.html.twig', [
+        return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
             'preview' => [
                 'openapi_spec' => [
                     'yaml' => $openApi->toYaml(),
