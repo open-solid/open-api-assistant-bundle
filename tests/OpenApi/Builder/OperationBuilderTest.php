@@ -47,6 +47,19 @@ class OperationBuilderTest extends AbstractBuilderTestCase
         $this->assertSameResult($openApi->toYaml(), 'open-api/builder/operation/post/user_spec.yaml');
     }
 
+    public function testPostNestedBuild(): void
+    {
+        $openApi = new OpenApi(['openapi' => '3.1.0']);
+        $request = $this->loadFileContent('open-api/builder/operation/post/user_tag_request.json');
+        $response = $this->loadFileContent('open-api/builder/operation/post/user_tag_response.json');
+
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), new HttpRequestInterpreter());
+        $operationBuilder->build('post', '/users/{id}/tags', $request, $response, $openApi);
+
+        $this->assertTrue($openApi->validate());
+        $this->assertSameResult($openApi->toYaml(), 'open-api/builder/operation/post/user_tag_spec.yaml');
+    }
+
     public function testPutBuild(): void
     {
         $openApi = new OpenApi(['openapi' => '3.1.0']);

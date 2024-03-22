@@ -53,8 +53,9 @@ class OpenApiAssistantAction extends AbstractController
         $inflector = InflectorFactory::create()->build();
         $operationClassBuilderOptions = new OperationClassBuilderOptions();
         $resourceName = $interpreter->getResourceName($uri);
+        $mainResourceName = $interpreter->getResourceName($uri, true);
         // TODO: read main namespace from composer.json psr-4 autoload section
-        $namespace = $request->request->getString('namespace', 'Demo\\'.$resourceName.'\\Controller\\'.$inflector->classify($method));
+        $namespace = $request->request->getString('namespace', 'Demo\\'.$mainResourceName.'\\Controller\\'.$inflector->classify($method));
         $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $operationClassBuilderOptions);
         $openApi = new OpenApi([ // TODO: read this info from config if any
             'openapi' => '3.1.0',
@@ -113,7 +114,7 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         if ('save' === $action) {
-            $dir = dirname(__DIR__, 2).sprintf('/demo/src/%s/Controller/%s', $resourceName, $inflector->classify($method));
+            $dir = dirname(__DIR__, 2).sprintf('/demo/src/%s/Controller/%s', $mainResourceName, $inflector->classify($method));
             if (!is_dir($dir) && !mkdir($dir, recursive: true) && !is_dir($dir)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
             }

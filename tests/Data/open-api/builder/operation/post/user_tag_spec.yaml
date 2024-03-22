@@ -1,0 +1,45 @@
+openapi: 3.1.0
+paths:
+  '/users/{id}/tags':
+    post:
+      operationId: f5828568ac1b721dd6a2faa37c929dba
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostUserTagBody'
+      responses:
+        '201':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostUserTagView'
+components:
+  schemas:
+    PostUserTagBody:
+      properties:
+        name:
+          type: string
+          example: tagA
+      type: object
+      writeOnly: true
+    PostUserTagView:
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f15fe4c1-e1e6-4c66-9857-fa320a8d0274
+        name:
+          type: string
+          example: tagA
+      type: object
+      readOnly: true

@@ -28,7 +28,7 @@ final readonly class HttpRequestInterpreter
         return '[' === $payload[0] ? 'array' : 'object';
     }
 
-    public function getResourceName(string $uri): string
+    public function getResourceName(string $uri, bool $main = false): string
     {
         $parts = array_filter(explode('/', $uri), static fn (string $part): bool => '' !== $part);
 
@@ -36,10 +36,25 @@ final readonly class HttpRequestInterpreter
             throw new \InvalidArgumentException(sprintf('Unable to guess resource name from URI "%s"', $uri));
         }
 
+        $resources = [];
         do {
-            $resource = array_pop($parts);
-        } while (null !== $resource && $resource[0] === '{');
+            do {
+                $resource = array_pop($parts);
+            } while (null !== $resource && $resource[0] === '{');
 
-        return ucfirst($this->inflector->singularize($resource));
+            if (null !== $resource) {
+                array_unshift($resources, ucfirst($this->inflector->singularize($resource)));
+            }
+        } while ($parts);
+
+        if ([] === $resources) {
+            throw new \InvalidArgumentException(sprintf('Unable to guess resource name from URI "%s"', $uri));
+        }
+
+        if ($main) {
+            return $resources[0];
+        }
+
+        return implode('', $resources);
     }
 }
