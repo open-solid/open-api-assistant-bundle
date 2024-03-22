@@ -52,8 +52,10 @@ readonly class SchemaClassBuilder
         ];
 
         $properties = [];
-        foreach ($schema->properties as $property) {
-            $properties[] = $this->buildProperty($property, $useStmts, [] === $properties);
+        if (is_array($schema->properties)) {
+            foreach ($schema->properties as $property) {
+                $properties[] = $this->buildProperty($property, $useStmts, [] === $properties);
+            }
         }
 
         $schemaAttrArgs = [];
