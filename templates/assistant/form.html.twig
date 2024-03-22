@@ -51,7 +51,12 @@
                         <div class="mt-2">
                             <div class="flex rounded-md bg-slate-800 ring-1 ring-inset {{ form.uri.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
                                 <label for="{{ form.uri.vars.id }}"
-                                       class="flex select-none items-center pl-3 text-slate-500 sm:text-sm">https://localhost/</label>
+                                       class="flex select-none items-center pl-3 text-slate-500 sm:text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="-ml-1 mr-1 w-4 h-4">
+                                        <path fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clip-rule="evenodd" />
+                                    </svg>
+                                    https://localhost/
+                                </label>
                                 <input type="text"
                                        autofocus="autofocus"
                                        name="{{ field_name(form.uri) }}"
