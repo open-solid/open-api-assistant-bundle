@@ -79,20 +79,44 @@
                          role="tabpanel"
                          tabindex="0"
                          aria-labelledby="tab-class-{{ loop.index }}"
-                         class="flex items-start {{ not loop.first ? 'hidden' }} bg-slate-800/60"
+                         class="{{ not loop.first ? 'hidden' }} bg-slate-800/60"
                     >
-                        {% set code_lines = class_code|split('\n')|length + 1 %}
-                        <div aria-hidden="true" class="select-none border-r border-slate-300/5 px-4 font-mono text-slate-600 text-sm leading-6 pt-3.5">
-                            {% for ln in 1..preview.line_numbers %}
-                                {% if ln <= code_lines %}
-                                    {{ ln|length < 2 ? '0' ~ ln : ln }}
-                                {% else %}
-                                    {{ ' ' }}
-                                {% endif %}
-                                <br>
+                        <div class="flex items-start">
+                            {% set code_lines = class_code|split('\n')|length + 1 %}
+                            <div aria-hidden="true" class="select-none border-r border-slate-300/5 px-4 font-mono text-slate-600 text-sm leading-6 pt-3.5">
+                                {% for ln in 1..preview.line_numbers %}
+                                    {% if ln <= code_lines %}
+                                        {{ ln|length < 2 ? '0' ~ ln : ln }}
+                                    {% else %}
+                                        {{ ' ' }}
+                                    {% endif %}
+                                    <br>
+                                {% endfor %}
+                            </div>
+                            <pre><code class="rounded-tl-none rounded-md bg-transparent language-php">{{ class_code }}</code></pre>
+                        </div>
+                        <div>
+                            <div class="flex items-center bg-slate-800 {{ form.dir.vars.errors|length > 0 ? 'ring-2 ring-inset ring-rose-500 focus-within:ring-rose-500' : '' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                                <label for="{{ form.dir.vars.id }}"
+                                       class="flex items-center pl-3 text-slate-500 sm:text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-1 mr-2 w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                                    </svg>
+                                    demo/src/
+                                </label>
+                                <input type="text"
+                                       name="{{ field_name(form.dir) }}"
+                                       autocomplete="off"
+                                       required
+                                       id="{{ form.dir.vars.id }}"
+                                       class="flex-1 border-0 bg-transparent py-1.5 pl-0 text-white focus:ring-0 sm:text-sm sm:leading-6"
+                                       value="{{ field_value(form.dir) }}"
+                                >
+                            </div>
+                            {% for error in form.dir.vars.errors %}
+                                <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
                             {% endfor %}
                         </div>
-                        <pre><code class="rounded-tl-none rounded-md bg-transparent language-php">{{ class_code }}</code></pre>
                     </div>
                 {% endfor %}
             </div>

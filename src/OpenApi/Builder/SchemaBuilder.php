@@ -129,7 +129,7 @@ final readonly class SchemaBuilder
     private function buildSchemaName(string $firstName, string $lastName, SchemaBuilderOptions $options): string
     {
         if ('' !== $options->suffix) {
-            $firstName = substr($firstName, 0, -strlen($options['suffix']));
+            $firstName = substr($firstName, 0, -strlen($options->suffix));
         }
 
         return $firstName.$lastName;

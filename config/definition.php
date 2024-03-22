@@ -6,7 +6,13 @@ return static function (DefinitionConfigurator $definition): void {
     $definition
         ->rootNode()
             ->children()
-                // ->scalarNode('name')->defaultValue('value')->end()
+                ->arrayNode('paths')
+                    ->children()
+                        ->scalarNode('controller')->defaultValue('<resource>/Controller/<method>/')->end()
+                        ->scalarNode('request')->defaultValue('<resource>/Controller/<method>/')->end()
+                        ->scalarNode('response')->defaultValue('<resource>/Controller/<method>/')->end()
+                    ->end()
+                ->end()
             ->end()
         ->end()
     ;

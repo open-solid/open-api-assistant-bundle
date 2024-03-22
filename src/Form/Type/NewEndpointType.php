@@ -26,6 +26,7 @@ class NewEndpointType extends AbstractType
             ->add('uri')
             ->add('req')
             ->add('res')
+            ->add('dir')
         ;
     }
 

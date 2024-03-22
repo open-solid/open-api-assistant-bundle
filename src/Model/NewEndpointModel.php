@@ -23,4 +23,7 @@ class NewEndpointModel
 
     #[Assert\Json(message: 'Please enter a valid JSON payload.')]
     public ?string $res = null;
+
+    #[Assert\NotBlank(message: 'Please enter a valid directory.', groups: ['save'])]
+    public ?string $dir = null;
 }
