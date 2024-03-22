@@ -96,6 +96,15 @@ readonly class SchemaClassBuilder
             $attrArgs['items'] = $this->builder->new('Items', [
                 'type' => new Expr\ClassConstFetch(new Name($this->parseClassRef($property->items->ref)), 'class'),
             ]);
+        } elseif ($property->type === 'object' && !Generator::isDefault($property->additionalProperties)) {
+            if (is_bool($property->additionalProperties)) {
+                $attrArgs['additionalProperties'] = true;
+            } else {
+                array_unshift($useStmts, $this->builder->use('OpenApi\\Attributes\\AdditionalProperties'));
+                $attrArgs['additionalProperties'] = $this->builder->new('AdditionalProperties', [
+                    'type' => $property->additionalProperties->type,
+                ]);
+            }
         }
 
         $prop = $this->builder->property($property->property)

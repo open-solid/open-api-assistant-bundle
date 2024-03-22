@@ -5,6 +5,7 @@ namespace OpenSolid\OpenApiAssistantBundle\OpenApi\Builder;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use JsonException;
+use OpenApi\Annotations\AdditionalProperties;
 use OpenApi\Annotations\Components;
 use OpenApi\Annotations\Items;
 use OpenApi\Annotations\OpenApi;
@@ -71,11 +72,22 @@ final readonly class SchemaBuilder
             }
 
             if (is_object($value)) {
-                $nestedSchemaName = $this->buildSchemaName($schemaName, ucfirst($key), $options);
-                $nestedSchema = $this->process($nestedSchemaName, $value, $components, $options);
-                $property = new Property(['property' => $key]);
-                $property->type = 'object';
-                $property->ref = '#/components/schemas/'.$nestedSchema->schema;
+                if ($value->additionalProperties ?? false) {
+                    $property = new Property(['property' => $key]);
+                    $property->type = 'object';
+                    if (is_bool($value->additionalProperties)) {
+                        $property->additionalProperties = true;
+                    } else {
+                        $property->additionalProperties = new AdditionalProperties([]);
+                        $property->additionalProperties->type = gettype($value->additionalProperties);
+                    }
+                } else {
+                    $nestedSchemaName = $this->buildSchemaName($schemaName, ucfirst($key), $options);
+                    $nestedSchema = $this->process($nestedSchemaName, $value, $components, $options);
+                    $property = new Property(['property' => $key]);
+                    $property->type = 'object';
+                    $property->ref = '#/components/schemas/'.$nestedSchema->schema;
+                }
             } elseif (is_array($value)) {
                 $property = new Property(['property' => $key]);
                 if ([] === $value) {
