@@ -8,7 +8,7 @@ use OpenSolid\OpenApiBundle\Routing\Attribute\Put;
 
 final class PutUserAction
 {
-    #[Put('/users/{id}')]
+    #[Put('/users/{id}', tags: ['User'])]
     public function __invoke(#[Path] string $id, #[Body] PutUserBody $body): PutUserView
     {
     }

@@ -2,6 +2,8 @@ openapi: 3.1.0
 paths:
   '/users/{id}':
     delete:
+      tags:
+        - User
       operationId: a509af6496861ca9d67b861c72ebf02e
       parameters:
         -

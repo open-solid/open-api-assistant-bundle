@@ -7,7 +7,7 @@ use OpenSolid\OpenApiBundle\Routing\Attribute\Delete;
 
 final class DeleteUserAction
 {
-    #[Delete('/users/{id}')]
+    #[Delete('/users/{id}', tags: ['User'])]
     public function __invoke(#[Path] string $id): void
     {
     }

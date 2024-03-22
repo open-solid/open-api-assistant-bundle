@@ -62,13 +62,14 @@ final readonly class OperationBuilder
     private function buildMethodItem(string $method, string $uri): Put|Delete|Get|Patch|Post
     {
         $operationId = md5(strtoupper($method.'::'.$uri));
+        $mainTag = $this->httpInterpreter->getResourceName($uri, true);
 
         return match ($method) {
-            'get' => new Get(['operationId' => $operationId]),
-            'post' => new Post(['operationId' => $operationId]),
-            'put' => new Put(['operationId' => $operationId]),
-            'patch' => new Patch(['operationId' => $operationId]),
-            'delete' => new Delete(['operationId' => $operationId]),
+            'get' => new Get(['operationId' => $operationId, 'tags' => [$mainTag]]),
+            'post' => new Post(['operationId' => $operationId, 'tags' => [$mainTag]]),
+            'put' => new Put(['operationId' => $operationId, 'tags' => [$mainTag]]),
+            'patch' => new Patch(['operationId' => $operationId, 'tags' => [$mainTag]]),
+            'delete' => new Delete(['operationId' => $operationId, 'tags' => [$mainTag]]),
             default => throw new \InvalidArgumentException(sprintf('Unsupported method "%s"', $method)),
         };
     }

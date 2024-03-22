@@ -43,6 +43,9 @@ readonly class OperationClassBuilder
         ];
 
         $routeAttrArgs = [$uri];
+        if (!Generator::isDefault($operation->tags)) {
+            $routeAttrArgs['tags'] = $operation->tags;
+        }
 
         $methodStmt = $this->builder->method('__invoke')
             ->makePublic();

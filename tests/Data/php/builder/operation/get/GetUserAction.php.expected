@@ -7,7 +7,7 @@ use OpenSolid\OpenApiBundle\Routing\Attribute\Get;
 
 final class GetUserAction
 {
-    #[Get('/users/{id}')]
+    #[Get('/users/{id}', tags: ['User'])]
     public function __invoke(#[Path] string $id): GetUserView
     {
     }

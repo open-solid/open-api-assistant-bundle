@@ -7,7 +7,7 @@ use OpenSolid\OpenApiBundle\Routing\Attribute\Post;
 
 final class PostUserAction
 {
-    #[Post('/users')]
+    #[Post('/users', tags: ['User'])]
     public function __invoke(#[Body] PostUserBody $body): PostUserView
     {
     }

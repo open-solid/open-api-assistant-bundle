@@ -6,7 +6,7 @@ use OpenSolid\OpenApiBundle\Routing\Attribute\Get;
 
 final class GetUserAction
 {
-    #[Get('/users', itemsType: GetUserView::class)]
+    #[Get('/users', tags: ['User'], itemsType: GetUserView::class)]
     public function __invoke(): array
     {
     }
