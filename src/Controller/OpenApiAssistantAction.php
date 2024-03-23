@@ -105,7 +105,7 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         // generate payloads content
-        if (!Generator::isDefault($openApi->components)) {
+        if (!Generator::isDefault($openApi->components) && !Generator::isDefault($openApi->components->schemas)) {
             $schemaClassBuilder = new SchemaClassBuilder();
             foreach ($openApi->components->schemas as $schema) {
                 $classesCode[$schema->schema] = $classCode = $schemaClassBuilder->build($namespace, $schema);

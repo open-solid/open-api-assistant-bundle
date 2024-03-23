@@ -20,6 +20,8 @@ use OpenApi\Annotations\Schema;
 use OpenApi\Generator;
 use OpenSolid\OpenApiAssistantBundle\Request\HttpRequestInterpreter;
 
+use function PHPUnit\Framework\isEmpty;
+
 final readonly class OperationBuilder
 {
     private Inflector $inflector;
@@ -57,6 +59,10 @@ final readonly class OperationBuilder
         }
 
         $this->buildResponse($method, $uri, $res ?? '', $openApi, $methodItem);
+
+        if (!$openApi->components->schemas) {
+            $openApi->components = Generator::UNDEFINED;
+        }
     }
 
     private function buildMethodItem(string $method, string $uri): Put|Delete|Get|Patch|Post
@@ -146,7 +152,11 @@ final readonly class OperationBuilder
         $content->schema->type = $this->httpInterpreter->getContentType($payload);
         if ('array' === $content->schema->type) {
             $content->schema->items = new Items([]);
-            $content->schema->items->ref = '#/components/schemas/'.$name;
+            if ('object' !== $type = $this->httpInterpreter->getContentItemsType($payload)) {
+                $content->schema->items->type = $type;
+            } else {
+                $content->schema->items->ref = '#/components/schemas/'.$name;
+            }
         } else {
             $content->schema->ref = '#/components/schemas/'.$name;
         }

@@ -1,0 +1,14 @@
+<?php
+
+namespace Api\User\Controller\Post;
+
+use OpenSolid\OpenApiBundle\Attribute\Body;
+use OpenSolid\OpenApiBundle\Routing\Attribute\Post;
+
+final class PostUserAction
+{
+    #[Post('/users', tags: ['User'], itemsType: 'int')]
+    public function __invoke(#[Body(itemsType: 'string')] array $body): array
+    {
+    }
+}

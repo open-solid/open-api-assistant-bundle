@@ -18,7 +18,7 @@ class OperationClassBuilderTest extends AbstractBuilderTestCase
         $this->assertSameResult($code, 'php/builder/operation/post/PostUserAction.php.expected');
     }
 
-    public function testPostItemsBuild(): void
+    public function testPostObjectItemsBuild(): void
     {
         $openApi = $this->loadOpenApiSpec('php/builder/operation/post/user_items_spec.yaml');
         $operationClassBuilder = new OperationClassBuilder(new HttpRequestInterpreter());
@@ -26,6 +26,16 @@ class OperationClassBuilderTest extends AbstractBuilderTestCase
         $code = $operationClassBuilder->build('Api\\User\\Controller\\Post', $openApi->paths['/users']->post, '/users');
 
         $this->assertSameResult($code, 'php/builder/operation/post/PostUserItemsAction.php.expected');
+    }
+
+    public function testPostScalarItemsBuild(): void
+    {
+        $openApi = $this->loadOpenApiSpec('php/builder/operation/post/scalar_items_spec.yaml');
+        $operationClassBuilder = new OperationClassBuilder(new HttpRequestInterpreter());
+
+        $code = $operationClassBuilder->build('Api\\User\\Controller\\Post', $openApi->paths['/users']->post, '/users');
+
+        $this->assertSameResult($code, 'php/builder/operation/post/PostScalarItemsAction.php.expected');
     }
 
     public function testGetBuild(): void

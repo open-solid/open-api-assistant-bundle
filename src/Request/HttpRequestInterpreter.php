@@ -4,6 +4,7 @@ namespace OpenSolid\OpenApiAssistantBundle\Request;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
+use RuntimeException;
 
 final readonly class HttpRequestInterpreter
 {
@@ -26,6 +27,17 @@ final readonly class HttpRequestInterpreter
     public function getContentType(string $payload): string
     {
         return '[' === $payload[0] ? 'array' : 'object';
+    }
+
+    public function getContentItemsType(string $payload): string
+    {
+        if ('array' !== $this->getContentType($payload)) {
+            throw new RuntimeException('Expected array payload, object given.');
+        }
+
+        $data = json_decode($payload, false, 512, JSON_THROW_ON_ERROR);
+
+        return gettype(current($data));
     }
 
     public function getResourceName(string $uri, bool $main = false): string
