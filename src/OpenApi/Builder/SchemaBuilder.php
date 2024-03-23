@@ -33,7 +33,7 @@ final readonly class SchemaBuilder
             $openApi->components->schemas = [];
         }
 
-        $this->process($name, json_decode($payload, flags: JSON_THROW_ON_ERROR), $openApi->components, $options);
+        $this->process($name, json_decode($payload, false, 512, JSON_THROW_ON_ERROR), $openApi->components, $options);
     }
 
     protected function process(string $name, mixed $payload, Components $components, SchemaBuilderOptions $options): Schema

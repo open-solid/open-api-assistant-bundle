@@ -107,10 +107,7 @@ final readonly class OperationBuilder
         $name = $this->inflector->classify($method.' '.$resource.' Body');
         $this->schemaBuilder->build($name, $payload, $openApi, $this->options->request);
 
-        $content = new MediaType(['mediaType' => 'application/json']);
-        $content->schema = new Schema([]);
-        $content->schema->ref = '#/components/schemas/'.$name;
-
+        $content = $this->buildContent($payload, $name);
         $requestBody = new RequestBody(['required' => true]);
         $requestBody->merge([$content]);
 
@@ -135,19 +132,25 @@ final readonly class OperationBuilder
         if ('' !== $payload) {
             $this->schemaBuilder->build($name, $payload, $openApi, $this->options->response);
 
-            $content = new MediaType(['mediaType' => 'application/json']);
-            $content->schema = new Schema([]);
-            $content->schema->type = $this->httpInterpreter->getContentType($payload);
-            if ('array' === $content->schema->type) {
-                $content->schema->items = new Items([]);
-                $content->schema->items->ref = '#/components/schemas/'.$name;
-            } else {
-                $content->schema->ref = '#/components/schemas/'.$name;
-            }
-
+            $content = $this->buildContent($payload, $name);
             $response->merge([$content]);
         }
 
         $methodItem->responses = [$response];
+    }
+
+    private function buildContent(string $payload, string $name): MediaType
+    {
+        $content = new MediaType(['mediaType' => 'application/json']);
+        $content->schema = new Schema([]);
+        $content->schema->type = $this->httpInterpreter->getContentType($payload);
+        if ('array' === $content->schema->type) {
+            $content->schema->items = new Items([]);
+            $content->schema->items->ref = '#/components/schemas/'.$name;
+        } else {
+            $content->schema->ref = '#/components/schemas/'.$name;
+        }
+
+        return $content;
     }
 }

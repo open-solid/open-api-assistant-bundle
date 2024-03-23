@@ -62,9 +62,13 @@ readonly class OperationClassBuilder
         }
 
         if (null !== $schema = $this->getContentMediaTypeSchema($operation->requestBody, $this->contentType)) {
+            $bodyAttrArgs = [];
+            if ('array' === $schema->type && !Generator::isDefault($schema->items)) {
+                $bodyAttrArgs['itemsType'] = $this->getPhpType($schema->items, true);
+            }
             array_unshift($useStmts, $this->builder->use('OpenSolid\\OpenApiBundle\\Attribute\\Body'));
             $param = $this->builder->param('body')
-                ->addAttribute($this->builder->attribute('Body'))
+                ->addAttribute($this->builder->attribute('Body', $bodyAttrArgs))
                 ->setType($this->getPhpType($schema))
             ;
             $methodStmt->addParam($param);
@@ -86,7 +90,7 @@ readonly class OperationClassBuilder
 
                 $methodStmt->setReturnType($returnType);
 
-                if ('array' === $returnType && null !== $schema && $schema->items) {
+                if ('array' === $returnType && null !== $schema && !Generator::isDefault($schema->items)) {
                     $routeAttrArgs['itemsType'] = $this->getPhpType($schema->items, true);
                 }
 

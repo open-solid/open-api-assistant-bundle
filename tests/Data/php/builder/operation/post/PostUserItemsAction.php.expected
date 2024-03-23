@@ -1,0 +1,14 @@
+<?php
+
+namespace Api\User\Controller\Post;
+
+use OpenSolid\OpenApiBundle\Attribute\Body;
+use OpenSolid\OpenApiBundle\Routing\Attribute\Post;
+
+final class PostUserAction
+{
+    #[Post('/users', tags: ['User'])]
+    public function __invoke(#[Body(itemsType: PostUserBody::class)] array $body): PostUserView
+    {
+    }
+}
