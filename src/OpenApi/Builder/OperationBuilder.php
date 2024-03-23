@@ -110,7 +110,7 @@ final readonly class OperationBuilder
         Post|Patch|Get|Delete|Put $methodItem
     ): void {
         $resource = $this->httpInterpreter->getResourceName($uri);
-        $name = $this->inflector->classify($method.' '.$resource.' Body');
+        $name = $this->inflector->classify($method.' '.$resource.' '.$this->options->request->suffix);
         $this->schemaBuilder->build($name, $payload, $openApi, $this->options->request);
 
         $content = $this->buildContent($payload, $name);
@@ -133,7 +133,7 @@ final readonly class OperationBuilder
         ]);
 
         $resource = $this->httpInterpreter->getResourceName($uri);
-        $name = $this->inflector->classify($method.' '.$resource.' View');
+        $name = $this->inflector->classify($method.' '.$resource.' '.$this->options->response->suffix);
 
         if ('' !== $payload) {
             $this->schemaBuilder->build($name, $payload, $openApi, $this->options->response);

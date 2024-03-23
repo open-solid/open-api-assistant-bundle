@@ -41,6 +41,8 @@ class Application extends Kernel
                 '%kernel.project_dir%/config/openapi.yaml',
             ],
         ]);
+
+        $container->import('config/openapi_assistant.yaml');
     }
 
     public function getProjectDir(): string

@@ -11,6 +11,7 @@ use OpenSolid\OpenApiAssistantBundle\Form\Type\NewEndpointType;
 use OpenSolid\OpenApiAssistantBundle\Model\FlashMessage;
 use OpenSolid\OpenApiAssistantBundle\Model\NewEndpointModel;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilder;
+use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilderOptions;
 use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilder;
 use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilder;
 use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilderOptions;
@@ -23,6 +24,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OpenApiAssistantAction extends AbstractController
 {
+    public function __construct(
+        private readonly OperationClassBuilderOptions $operationClassBuilderOptions,
+        private readonly OperationBuilderOptions $operationBuilderOptions,
+    ) {
+    }
+
     public function __invoke(Request $request): Response
     {
         $newEndpoint = new NewEndpointModel();
@@ -51,19 +58,18 @@ class OpenApiAssistantAction extends AbstractController
 
         $interpreter = new HttpRequestInterpreter();
         $inflector = InflectorFactory::create()->build();
-        $operationClassBuilderOptions = new OperationClassBuilderOptions();
         $resourceName = $interpreter->getResourceName($uri);
         $mainResourceName = $interpreter->getResourceName($uri, true);
         // TODO: read main namespace from composer.json psr-4 autoload section
         $namespace = $request->request->getString('namespace', 'Demo\\'.$mainResourceName.'\\Controller\\'.$inflector->classify($method));
-        $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $operationClassBuilderOptions);
+        $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $this->operationClassBuilderOptions);
         $openApi = new OpenApi([ // TODO: read this info from config if any
             'openapi' => '3.1.0',
             'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
         ]);
 
         // build Open API Spec
-        $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter);
+        $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter, $this->operationBuilderOptions);
         $operationBuilder->build($method, $uri, $req, $res, $openApi);
 
         try {
@@ -99,7 +105,7 @@ class OpenApiAssistantAction extends AbstractController
                 continue;
             }
 
-            $controllerClassName = $inflector->classify($operation->method.' '.$resourceName.' '.$operationClassBuilderOptions->suffix);
+            $controllerClassName = $inflector->classify($operation->method.' '.$resourceName.' '.$this->operationClassBuilderOptions->suffix);
             $classesCode[$controllerClassName] = $controllerCode = $operationClassBuilder->build($namespace, $operation, $uri);
             $lineNumbers = max($lineNumbers, substr_count($controllerCode, "\n") + 2);
         }

@@ -1,0 +1,8 @@
+openapi_assistant:
+    operation:
+        controller:
+            suffix: 'Controller'
+        request:
+            suffix: 'Request'
+        response:
+            suffix: 'Response'
