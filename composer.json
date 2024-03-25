@@ -3,7 +3,6 @@
     "type": "symfony-bundle",
     "license": "MIT",
     "description": "Assistant for OpenApiBundle",
-    "minimum-stability": "dev",
     "require": {
         "php": ">=8.2",
         "doctrine/inflector": "^2.0",
@@ -15,7 +14,7 @@
         "symfony/validator": "^7.0"
     },
     "require-dev": {
-        "open-solid/open-api-bundle": "dev-main",
+        "open-solid/open-api-bundle": "^0",
         "phpunit/phpunit": "^10"
     },
     "config": {
