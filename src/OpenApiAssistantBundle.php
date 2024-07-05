@@ -2,8 +2,8 @@
 
 namespace OpenSolid\OpenApiAssistantBundle;
 
-use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\SchemaBuilderOptions;
-use OpenSolid\OpenApiAssistantBundle\Php\Builder\OperationClassBuilderOptions;
+use OpenSolid\OpenApiAssistant\OpenApi\Builder\SchemaBuilderOptions;
+use OpenSolid\OpenApiAssistant\Php\Builder\OperationClassBuilderOptions;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;

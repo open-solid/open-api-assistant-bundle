@@ -15,3 +15,7 @@ composer require --dev open-solid/open-api-assistant-bundle
 - [x] Generate API controller class from a given OpenApi Operation spec
 - [x] Generate PHP Schema classes from a given OpenApi Schema spec
 - [ ] UI for generating OpenApi/Symfony building blocks from a given Method, URI and Request/Response Payloads
+
+## License
+
+This tool is available under the [MIT License](LICENSE), which means you can use it pretty freely in your projects.

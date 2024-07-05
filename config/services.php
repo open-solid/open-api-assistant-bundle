@@ -1,7 +1,7 @@
 <?php
 
+use OpenSolid\OpenApiAssistant\OpenApi\Builder\OperationBuilderOptions;
 use OpenSolid\OpenApiAssistantBundle\Controller\OpenApiAssistantAction;
-use OpenSolid\OpenApiAssistantBundle\OpenApi\Builder\OperationBuilderOptions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
