@@ -47,6 +47,19 @@
                         return [];
                     }
 
+                    const textUntilPosition = model.getValueInRange({
+                        startLineNumber: 1,
+                        startColumn: 1,
+                        endLineNumber: position.lineNumber,
+                        endColumn: position.column,
+                    });
+                    const match = textUntilPosition.match(
+                        /[{,]\s*("[^"]*"\s*:\s*"[^"]*"\s*,\s*)*([^"]*)?$/
+                    );
+                    if (!match) {
+                        return { suggestions: [] };
+                    }
+
                     const word = model.getWordUntilPosition(position);
                     const range = {
                         startLineNumber: position.lineNumber,
@@ -61,7 +74,23 @@
                                 label: 'id (UUID)',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A Universal Unique Identifier (UUID)",
-                                insertText: '"${1:id}": "' + crypto.randomUUID() + '"',
+                                insertText: '"${1:id}": "' + crypto.randomUUID() + '",',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'id (Integer)',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "An integer identifier",
+                                insertText: '"${1:id}": 1,',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'email',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "An email field type",
+                                insertText: '"${1:email}": "${2:name}@example.com",',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -69,7 +98,7 @@
                                 label: 'password',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A password field type",
-                                insertText: '"${1:password}": "********"',
+                                insertText: '"${1:password}": "********",',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -77,15 +106,15 @@
                                 label: 'date (YYYY-MM-DD)',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A date field type (ISO 8601)",
-                                insertText: '"${1:date}": "${2:' + new Date().toISOString().split('T')[0] + '}"',
+                                insertText: '"${1:date}": "${2:' + new Date().toISOString().split('T')[0] + '}",',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
                             {
-                                label: 'datetime (YYYY-MM-DDTHH:MM:SSZ)',
+                                label: 'date-time (YYYY-MM-DDTHH:MM:SSZ)',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A datetime field type (ISO 8601)",
-                                insertText: '"${1:datetime}": "${2:' + new Date().toISOString() + '}"',
+                                insertText: '"${1:datetime}": "${2:' + new Date().toISOString() + '}",',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -93,7 +122,7 @@
                                 label: 'bool',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A boolean field type",
-                                insertText: '"${1:boolean}": true',
+                                insertText: '"${1:boolean}": true,',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -101,7 +130,7 @@
                                 label: 'int',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "An integer field type",
-                                insertText: '"${1:integer}": ${2:' + Math.floor(Math.random() * 100) + '}',
+                                insertText: '"${1:integer}": ${2:' + Math.floor(Math.random() * 100) + '},',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -109,7 +138,7 @@
                                 label: 'float',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A float field type",
-                                insertText: '"${1:float}": ${2:' + (Math.random() * 100).toFixed(2) + '}',
+                                insertText: '"${1:float}": ${2:' + (Math.random() * 100).toFixed(2) + '},',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -117,7 +146,7 @@
                                 label: 'enum',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "An enum field type",
-                                insertText: '"${1:enum}": ["${2:case1}", "${3:case2}"]',
+                                insertText: '"${1:enum}": ["${2:case1}", "${3:case2}"],',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
@@ -125,7 +154,7 @@
                                 label: 'struct',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A struct field type",
-                                insertText: '"${1:struct}": {${2:}}',
+                                insertText: '"${1:struct}": {${2:}},',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
