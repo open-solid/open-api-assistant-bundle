@@ -6,6 +6,7 @@ use Doctrine\Inflector\InflectorFactory;
 use Exception;
 use OpenApi\Annotations\Info;
 use OpenApi\Annotations\OpenApi;
+use OpenApi\Context;
 use OpenApi\Generator;
 use OpenSolid\OpenApiAssistant\Http\HttpRequestInterpreter;
 use OpenSolid\OpenApiAssistant\OpenApi\Builder\OperationBuilder;
@@ -64,7 +65,7 @@ class OpenApiAssistantAction extends AbstractController
         $namespace = $request->request->getString('namespace', 'Demo\\'.$mainResourceName.'\\Controller\\'.$inflector->classify($method));
         $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $this->operationClassBuilderOptions);
         $openApi = new OpenApi([ // TODO: read this info from config if any
-            'openapi' => '3.1.0',
+            '_context' => new Context(['version' => '3.1.0']),
             'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
         ]);
 

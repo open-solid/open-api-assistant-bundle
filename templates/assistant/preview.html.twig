@@ -6,7 +6,7 @@
         </div>
 
         <div>
-            <nav class="flex border-b border-slate-800" aria-label="Tabs">
+            <nav class="flex" aria-label="Tabs">
                 <ul role="tablist" class="flex min-w-full flex-none gap-x-1 text-sm leading-6 text-slate-400">
                     <li>
                         <a id="tab-0"
@@ -14,7 +14,7 @@
                            class="cursor-pointer aria-selected:text-white hover:text-slate-300 border-b-2 border-transparent aria-selected:border-indigo-500 py-3 px-3 inline-block"
                            aria-selected="true"
                            aria-controls="tabpanel-0"
-                        >openapi.yaml</a>
+                        >openapi.json</a>
                     </li>
                 </ul>
             </nav>
@@ -22,14 +22,15 @@
                  role="tabpanel"
                  tabindex="0"
                  aria-labelledby="tab-0"
-                 class="flex items-start bg-slate-800/60"
+                 class="flex items-start"
             >
-                <div aria-hidden="true" class="select-none border-r border-slate-300/5 px-4 font-mono text-slate-600 text-sm leading-6 pt-3.5">
-                    {% for ln in 1..(preview.openapi_spec.yaml|split('\n')|length) %}
-                        {{ ln|length < 2 ? '0' ~ ln : ln }}<br>
-                    {% endfor %}
-                </div>
-                <pre class="overflow-x-scroll"><code class="rounded-tl-none rounded-md bg-transparent language-yaml">{{ preview.openapi_spec.yaml }}</code></pre>
+                <monaco-editor id="openapi"
+                               name="openapi"
+                               value="{{ preview.openapi_spec.json }}"
+                               class="block w-full h-[48rem] rounded-tl-none rounded-md border-0 bg-slate-800/60 pt-2.5 pb-1.5 pl-2.5 pr-0.5 text-white shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 focus-visible:outline-none {{ form.req.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
+                               language="json"
+                               schema-uri="https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.1/schema.json"
+                ></monaco-editor>
             </div>
         </div>
     {% endif %}
@@ -56,7 +57,7 @@
                     </select>
                 </div>
                 <div class="hidden sm:block">
-                    <nav class="flex border-b border-slate-800" aria-label="Tabs">
+                    <nav class="flex" aria-label="Tabs">
                         <ul role="tablist" class="flex min-w-full flex-none gap-x-1 text-sm leading-6 text-slate-400">
                             {% for name, class_code in preview.classes_code %}
                                 <li>

@@ -3,6 +3,114 @@
 {% block head %}
     <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css">
     <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <style>
+        .monaco-editor {
+            outline: none !important;
+        }
+        .monaco-editor .lines-content .core-guide-indent {
+            --indent-color: #35404e !important;
+            --indent-color-active: #53647b !important;
+        }
+        .monaco-editor [class*="bracket-highlighting-"] {
+            color: #bcbec4 !important;
+        }
+    </style>
+    <script>
+        require.config({ paths: {'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs'}});
+
+        require(['vs/editor/editor.main'], function() {
+            monaco.editor.defineTheme('vs-dark-json', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'string.value.json', foreground: '6aab73' },
+                    { token: 'string.key.json', foreground: 'c77dbb' },
+                    { token: 'number.json', foreground: '2aacb8' },
+                    { token: 'keyword.json', foreground: 'cf8e6d' },
+                    { token: 'delimiter.bracket.json', foreground: 'ffffff' },
+                    { token: 'delimiter.array.json', foreground: 'ffffff' },
+                ],
+                colors: {
+                    'editor.background': '#182134',
+                    'editor.lineHighlightBorder': "#182134",
+                    'editorLineNumber.foreground': '#475569',
+                    'editorBracketMatch.border': '#182134',
+                    'editor.wordHighlightBackground': '#29385b',
+                    'editor.inactiveSelectionBackground': '#31436d',
+                },
+            });
+        });
+
+        class MonacoEditor extends HTMLElement {
+            defaultOptions = {
+                fontSize: 14,
+                theme: 'vs-dark-json',
+                automaticLayout: true,
+                lineNumbersMinChars: 3,
+                lineNumbers: (lineNumber) => {
+                    return lineNumber.toString().padStart(2, '0');
+                },
+                minimap: {
+                    enabled: false
+                },
+            }
+
+            constructor() {
+                super();
+            }
+
+            connectedCallback() {
+                const self = this;
+                const id = self.getAttribute('id'); self.removeAttribute('id');
+                const name = self.getAttribute('name'); self.removeAttribute('name');
+                const value = self.getAttribute('value'); self.removeAttribute('value');
+                const language = self.getAttribute('language');
+                const schemaUri = self.getAttribute('schema-uri');
+                const form = self.closest('form');
+
+                // add hidden input to the form
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = name;
+                hiddenInput.value = value;
+                form.appendChild(hiddenInput);
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    require(['vs/editor/editor.main'], function() {
+                        const modelUri = schemaUri ? monaco.Uri.parse(schemaUri) : null;
+                        const model = monaco.editor.createModel(value, language, modelUri);
+
+                        if (schemaUri) {
+                            fetch(schemaUri)
+                                .then(response => response.json())
+                                .then(schema => {
+                                    monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+                                        validate: true,
+                                        schemas: [{
+                                            uri: schemaUri,
+                                            fileMatch: [modelUri.toString()],
+                                            schema,
+                                        }]
+                                    });
+                                })
+                            ;
+                        }
+
+                        self.editor = monaco.editor.create(self, { model, ...self.defaultOptions });
+
+                        self.editor.onDidChangeModelContent(() => {
+                            form.elements[name].value = self.editor.getValue();
+                        });
+
+                        self.querySelector('textarea').setAttribute('id', id);
+                    });
+                })
+            }
+        }
+
+        customElements.define('monaco-editor', MonacoEditor);
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +147,7 @@
                     <div class="mt-4 sm:flex-none">
                         <label for="{{ form.method.vars.id }}" class="block text-sm font-medium leading-6 text-white">Method</label>
                         <div class="mt-2">
-                            {{ form_widget(form.method, {'attr': {'class': 'block rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset ' ~ (form.method.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10') ~ ' focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black'}}) }}
+                            {{ form_widget(form.method, {'attr': {'class': 'block rounded-md border-0 bg-slate-800/60 py-1.5 text-white shadow-sm ring-1 ring-inset ' ~ (form.method.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10') ~ ' focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6 [&_*]:text-black'}}) }}
                             {% for error in form.method.vars.errors %}
                                 <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
                             {% endfor %}
@@ -49,7 +157,7 @@
                     <div class="sm:flex-1 sm:grow">
                         <label for="{{ form.uri.vars.id }}" class="block text-sm font-medium leading-6 text-white">URI</label>
                         <div class="mt-2">
-                            <div class="flex rounded-md bg-slate-800 ring-1 ring-inset {{ form.uri.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                            <div class="flex rounded-md bg-slate-800/60 ring-1 ring-inset {{ form.uri.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
                                 <label for="{{ form.uri.vars.id }}"
                                        class="flex select-none items-center pl-3 text-slate-500 sm:text-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="-ml-1 mr-1 w-4 h-4">
@@ -87,12 +195,12 @@
                             </svg>
                         </div>
                         <div class="mt-2">
-                        <textarea rows="10"
-                                  name="{{ field_name(form.req) }}"
-                                  id="{{ form.req.vars.id }}"
-                                  class="block w-full rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-indigo-500 {{ form.req.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
-                                  placeholder="Add your request payload..."
-                        >{{ field_value(form.req) }}</textarea>
+                            <monaco-editor id="{{ form.req.vars.id }}"
+                                           name="{{ field_name(form.req) }}"
+                                           value="{{ field_value(form.req) }}"
+                                           class="block w-full h-[16rem] rounded-md border-0 bg-slate-800/60 pt-2.5 pb-1.5 pl-2.5 pr-0.5 text-white shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 focus-visible:outline-none {{ form.req.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
+                                           language="json"
+                            ></monaco-editor>
                             {% for error in form.req.vars.errors %}
                                 <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
                             {% endfor %}
@@ -110,12 +218,12 @@
                             </svg>
                         </div>
                         <div class="mt-2">
-                        <textarea rows="10"
-                                  name="{{ field_name(form.res) }}"
-                                  id="{{ form.res.vars.id }}"
-                                  class="block w-full rounded-md border-0 bg-slate-800 py-1.5 text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-indigo-500 {{ form.res.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
-                                  placeholder="Add your response payload..."
-                        >{{ field_value(form.res) }}</textarea>
+                            <monaco-editor id="{{ form.res.vars.id }}"
+                                           name="{{ field_name(form.res) }}"
+                                           value="{{ field_value(form.res) }}"
+                                           class="block w-full h-[16rem] rounded-md border-0 bg-slate-800/60 pt-2.5 pb-1.5 pl-2.5 pr-0.5 text-white shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 focus-visible:outline-none {{ form.req.vars.errors|length > 0 ? 'ring-2 ring-rose-500 focus-within:ring-rose-500' : 'ring-white/10' }} sm:text-sm sm:leading-6"
+                                           language="json"
+                            ></monaco-editor>
                             {% for error in form.res.vars.errors %}
                                 <p class="mt-2 text-sm text-rose-500">{{ error.message }}</p>
                             {% endfor %}
