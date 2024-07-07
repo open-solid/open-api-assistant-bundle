@@ -58,7 +58,7 @@
                     return {
                         suggestions: [
                             {
-                                label: 'uuid',
+                                label: 'id (UUID)',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A Universal Unique Identifier (UUID)",
                                 insertText: '"${1:id}": "' + crypto.randomUUID() + '"',
@@ -74,7 +74,7 @@
                                 range: range,
                             },
                             {
-                                label: 'date',
+                                label: 'date (YYYY-MM-DD)',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A date field type (ISO 8601)",
                                 insertText: '"${1:date}": "${2:' + new Date().toISOString().split('T')[0] + '}"',
@@ -82,7 +82,7 @@
                                 range: range,
                             },
                             {
-                                label: 'datetime',
+                                label: 'datetime (YYYY-MM-DDTHH:MM:SSZ)',
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "A datetime field type (ISO 8601)",
                                 insertText: '"${1:datetime}": "${2:' + new Date().toISOString() + '}"',
@@ -118,6 +118,14 @@
                                 kind: monaco.languages.CompletionItemKind.Function,
                                 documentation: "An enum field type",
                                 insertText: '"${1:enum}": ["${2:case1}", "${3:case2}"]',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'struct',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A struct field type",
+                                insertText: '"${1:struct}": {${2:}}',
                                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                                 range: range,
                             },
