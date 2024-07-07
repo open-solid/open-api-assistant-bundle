@@ -40,6 +40,91 @@
                     'editor.inactiveSelectionBackground': '#31436d',
                 },
             });
+
+            monaco.languages.registerCompletionItemProvider('json', {
+                provideCompletionItems: function (model, position) {
+                    if (model.uri.scheme !== 'inmemory') {
+                        return [];
+                    }
+
+                    const word = model.getWordUntilPosition(position);
+                    const range = {
+                        startLineNumber: position.lineNumber,
+                        endLineNumber: position.lineNumber,
+                        startColumn: word.startColumn,
+                        endColumn: word.endColumn,
+                    };
+
+                    return {
+                        suggestions: [
+                            {
+                                label: 'uuid',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A Universal Unique Identifier (UUID)",
+                                insertText: '"${1:id}": "' + crypto.randomUUID() + '"',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'password',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A password field type",
+                                insertText: '"${1:password}": "********"',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'date',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A date field type (ISO 8601)",
+                                insertText: '"${1:date}": "${2:' + new Date().toISOString().split('T')[0] + '}"',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'datetime',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A datetime field type (ISO 8601)",
+                                insertText: '"${1:datetime}": "${2:' + new Date().toISOString() + '}"',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'bool',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A boolean field type",
+                                insertText: '"${1:boolean}": true',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'int',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "An integer field type",
+                                insertText: '"${1:integer}": ${2:' + Math.floor(Math.random() * 100) + '}',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'float',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "A float field type",
+                                insertText: '"${1:float}": ${2:' + (Math.random() * 100).toFixed(2) + '}',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                            {
+                                label: 'enum',
+                                kind: monaco.languages.CompletionItemKind.Function,
+                                documentation: "An enum field type",
+                                insertText: '"${1:enum}": ["${2:case1}", "${3:case2}"]',
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                                range: range,
+                            },
+                        ],
+                    };
+                },
+            });
         });
 
         class MonacoEditor extends HTMLElement {
@@ -186,7 +271,7 @@
                 <div class="space-y-4 md:space-y-0 md:space-x-4 md:flex">
                     <div class="md:flex-1">
                         <div class="flex items-center">
-                            <label for="{{ form.req.vars.id }}" class="block text-sm font-medium leading-6 text-white">Request</label>
+                            <label for="{{ form.req.vars.id }}" class="block text-sm font-medium leading-6 text-white">request.json</label>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                                  class="w-5 h-5 fill-white ml-1 hidden">
                                 <path fill-rule="evenodd"
@@ -209,7 +294,7 @@
 
                     <div class="md:flex-1">
                         <div class="flex items-center">
-                            <label for="{{ form.res.vars.id }}" class="block text-sm font-medium leading-6 text-white">Response</label>
+                            <label for="{{ form.res.vars.id }}" class="block text-sm font-medium leading-6 text-white">response.json</label>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                                  class="w-5 h-5 fill-white ml-1 hidden">
                                 <path fill-rule="evenodd"
