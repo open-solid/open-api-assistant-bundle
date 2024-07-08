@@ -5,6 +5,7 @@ namespace OpenSolid\OpenApiAssistantBundle\Form\Type;
 use OpenSolid\OpenApiAssistantBundle\Model\NewEndpointModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -24,8 +25,9 @@ class NewEndpointType extends AbstractType
                 'invalid_message' => 'Please select a valid method.',
             ])
             ->add('uri')
-            ->add('req')
-            ->add('res')
+            ->add('req', HiddenType::class)
+            ->add('res', HiddenType::class)
+            ->add('openapi', HiddenType::class)
             ->add('dir')
         ;
     }

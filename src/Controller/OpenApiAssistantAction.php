@@ -8,6 +8,7 @@ use OpenApi\Annotations\Info;
 use OpenApi\Annotations\OpenApi;
 use OpenApi\Context;
 use OpenApi\Generator;
+use OpenApi\Serializer;
 use OpenSolid\OpenApiAssistant\Http\HttpRequestInterpreter;
 use OpenSolid\OpenApiAssistant\OpenApi\Builder\OperationBuilder;
 use OpenSolid\OpenApiAssistant\OpenApi\Builder\OperationBuilderOptions;
@@ -28,6 +29,7 @@ class OpenApiAssistantAction extends AbstractController
     public function __construct(
         private readonly OperationClassBuilderOptions $operationClassBuilderOptions,
         private readonly OperationBuilderOptions $operationBuilderOptions,
+        private readonly Serializer $serializer = new Serializer(),
     ) {
     }
 
@@ -55,7 +57,7 @@ class OpenApiAssistantAction extends AbstractController
         $uri = '/'.strtolower(trim($newEndpoint->uri, '/'));
         $req = $newEndpoint->req;
         $res = $newEndpoint->res;
-        $action = $request->request->getString('action') ?: 'preview';
+        $action = $request->request->getString('action');
 
         $interpreter = new HttpRequestInterpreter();
         $inflector = InflectorFactory::create()->build();
@@ -64,28 +66,61 @@ class OpenApiAssistantAction extends AbstractController
         // TODO: read main namespace from composer.json psr-4 autoload section
         $namespace = $request->request->getString('namespace', 'Demo\\'.$mainResourceName.'\\Controller\\'.$inflector->classify($method));
         $operationClassBuilder = new OperationClassBuilder($interpreter, 'application/json', $this->operationClassBuilderOptions);
-        $openApi = new OpenApi([ // TODO: read this info from config if any
-            '_context' => new Context(['version' => '3.1.0']),
-            'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
-        ]);
 
-        // build Open API Spec
-        $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter, $this->operationBuilderOptions);
-        $operationBuilder->build($method, $uri, $req, $res, $openApi);
-
-        try {
-            $openApi->validate();
-        } catch (Exception $e) {
-            $this->addFlash('error', new FlashMessage(
-                title: 'Validation failed!',
-                body: 'Something went wrong generating the OpenAPI Spec.',
-            ));
-
-            $form->addError(new FormError($e->getMessage()));
-
-            return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
-                'form' => $form->createView(),
+        if ('payload' === $action) {
+            $openApi = new OpenApi([ // TODO: read this info from config if any
+                '_context' => new Context(['version' => '3.1.0']),
+                'info' => new Info(['title' => 'API', 'version' => '1.0.0']),
             ]);
+            $operationBuilder = new OperationBuilder(new SchemaBuilder(), $interpreter, $this->operationBuilderOptions);
+            $operationBuilder->build($method, $uri, $req, $res, $openApi);
+
+            try {
+                $openApi->validate();
+            } catch (Exception $e) {
+                $this->addFlash('error', new FlashMessage(
+                    title: 'Validation failed!',
+                    body: 'Something went wrong generating the OpenAPI Spec.',
+                ));
+
+                $form->addError(new FormError($e->getMessage()));
+
+                return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+
+            $newEndpoint->openapi = $openApi->toJson();
+            $form = $this->createForm(NewEndpointType::class, $newEndpoint);
+
+            $this->addFlash('success', new FlashMessage(
+                title: 'OpenAPI spec preview is ready!',
+                body: 'Review or edit the OpenAPI spec generated.',
+            ));
+        } else {
+            $openApi = $this->serializer->deserialize($newEndpoint->openapi, OpenApi::class);
+
+            try {
+                $openApi->validate();
+            } catch (Exception $e) {
+                $this->addFlash('error', new FlashMessage(
+                    title: 'Validation failed!',
+                    body: 'Something went wrong validating the OpenAPI Spec.',
+                ));
+
+                $form->addError(new FormError($e->getMessage()));
+
+                return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+
+            if ('openapi' === $action) {
+                $this->addFlash('success', new FlashMessage(
+                    title: 'PHP code preview is ready!',
+                    body: 'Review the controller and DTOs files to save.',
+                ));
+            }
         }
 
         // generate controller content
@@ -138,11 +173,8 @@ class OpenApiAssistantAction extends AbstractController
         }
 
         return $this->render('@OpenApiAssistant/assistant/form.html.twig', [
+            'action' => $action,
             'preview' => [
-                'openapi_spec' => [
-                    'yaml' => $openApi->toYaml(),
-                    'json' => $openApi->toJson(),
-                ],
                 'classes_code' => $classesCode,
                 'line_numbers' => $lineNumbers,
             ],
